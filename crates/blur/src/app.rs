@@ -35,7 +35,7 @@ use gpui::{
 use crate::views::file_finder::{FileFinderEvent, FileFinderView, FinderMode};
 use crate::views::git_view::{GitView, GitViewEvent};
 use crate::views::lsp_view::LspView;
-use crate::views::settings_view::{SettingsView, SettingsViewEvent};
+use crate::views::settings_view::{SettingsPatch, SettingsView, SettingsViewEvent};
 use crate::views::terminal_view::TerminalView;
 use crate::views::theme_studio_view::{ThemeStudioEvent, ThemeStudioView};
 use crate::views::utilities_view::UtilitiesView;
@@ -60,6 +60,10 @@ pub enum OverlayMode {
     CommandPalette,
     ThemeSwitcher,
     NewFile,
+    OpenFile,
+    OpenFolder,
+    OpenWorkspace,
+    NewWorkspace,
 }
 
 struct TreeNode {
@@ -241,22 +245,21 @@ impl AppShell {
         let settings_view = cx.new(|cx| SettingsView::new(&config, ext_names, cx));
         cx.subscribe(&settings_view, |this, sv, ev: &SettingsViewEvent, cx| match ev {
             SettingsViewEvent::SettingsChanged => {
-                let (fs, lh, tab_size, trim_ws, rel_lines, auto_pairs, nav_mode) =
-                    sv.read(cx).current_editor_overrides();
-                let ui_scale = sv.read(cx).ui_scale();
-                this.set_ui_scale(ui_scale, cx);
-                let mut ed = this.config.settings().editor.clone();
-                ed.font_size = fs;
-                ed.line_height = lh;
-                ed.tab_size = tab_size;
-                ed.trim_trailing_whitespace = trim_ws;
-                ed.relative_line_numbers = rel_lines;
-                ed.auto_pairs = auto_pairs;
-                ed.navigation_mode = nav_mode;
-                for tab in &this.tabs {
-                    tab.update(cx, |e, cx| e.update_settings(ed.clone(), cx));
-                }
-                cx.notify();
+                let patch = sv.read(cx).patch();
+                this.apply_settings_patch(&patch, cx);
+            }
+            SettingsViewEvent::SaveNow => {
+                let patch = sv.read(cx).patch();
+                this.apply_settings_patch(&patch, cx);
+                let path = this.config.user_path().display().to_string();
+                this.push_notification(
+                    format!("Configuration saved to {path}"),
+                    NotificationLevel::Success,
+                    cx,
+                );
+            }
+            SettingsViewEvent::Notify(msg) => {
+                this.push_notification(msg.clone(), NotificationLevel::Info, cx);
             }
             SettingsViewEvent::ThemeSelected(name) => {
                 this.apply_theme(name, cx);
@@ -282,7 +285,26 @@ impl AppShell {
                 }
             }
             TextInputEvent::MoveDown => {
-                this.palette_idx += 1;
+                // Clamp to the number of rows the overlay actually renders.
+                let max = match this.overlay {
+                    OverlayMode::CommandPalette => {
+                        let q = this.palette_input.read(cx).value().to_string();
+                        this.commands.fuzzy_search(&q).len().min(12)
+                    }
+                    OverlayMode::ThemeSwitcher => {
+                        let q = this.palette_input.read(cx).value().to_lowercase();
+                        cx.global::<ThemeRegistry>()
+                            .list()
+                            .iter()
+                            .filter(|t| q.is_empty() || t.name.to_lowercase().contains(&q))
+                            .count()
+                    }
+                    OverlayMode::None => 0,
+                    _ => 1,
+                };
+                if this.palette_idx + 1 < max {
+                    this.palette_idx += 1;
+                }
                 cx.notify();
             }
             TextInputEvent::Escape => {
@@ -609,9 +631,11 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
 
         let lr = self.lang_registry.clone();
         let ed_settings = self.config.settings().editor.clone();
+        let inset = self.sidebar_inset();
         match Buffer::open(&path) {
             Ok(buffer) => {
                 let entity = cx.new(|cx| EditorView::new(buffer, lr, ed_settings, cx));
+                entity.update(cx, |ed, _| ed.set_left_inset(inset));
 
                 // Attach LSP client lazily if enabled and available
                 if self.config.settings().lsp.enabled {
@@ -624,19 +648,21 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                         }
                     }
                 }
-                // Populate git gutter markers
-                if let Ok(repo) = GitRepo::discover(&self.workspace_root) {
-                    if let Ok(rel) = path.strip_prefix(repo.root()) {
-                        let text = entity.read(cx).text();
-                        let marks = repo.line_changes(rel, &text).into_iter().map(|c| {
-                            let k = match c.kind {
-                                LineChangeKind::Added => GutterChangeKind::Added,
-                                LineChangeKind::Modified => GutterChangeKind::Modified,
-                                LineChangeKind::Deleted => GutterChangeKind::Deleted,
-                            };
-                            (c.line, k)
-                        });
-                        entity.update(cx, |ed, cx| ed.set_gutter_changes(marks, cx));
+                // Populate git gutter markers (honors git.show_gutter_diff)
+                if self.config.settings().git.show_gutter_diff {
+                    if let Ok(repo) = GitRepo::discover(&self.workspace_root) {
+                        if let Ok(rel) = path.strip_prefix(repo.root()) {
+                            let text = entity.read(cx).text();
+                            let marks = repo.line_changes(rel, &text).into_iter().map(|c| {
+                                let k = match c.kind {
+                                    LineChangeKind::Added => GutterChangeKind::Added,
+                                    LineChangeKind::Modified => GutterChangeKind::Modified,
+                                    LineChangeKind::Deleted => GutterChangeKind::Deleted,
+                                };
+                                (c.line, k)
+                            });
+                            entity.update(cx, |ed, cx| ed.set_gutter_changes(marks, cx));
+                        }
                     }
                 }
 
@@ -954,12 +980,278 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
         cx.notify();
     }
 
+    /// Window-space left inset of the editor column (sidebar width when visible).
+    fn sidebar_inset(&self) -> f32 {
+        if self.sidebar_visible {
+            256.0
+        } else {
+            0.0
+        }
+    }
+
+    /// Toggles/shows/hides the sidebar and keeps every open editor's mouse
+    /// mapping inset in sync so text selection stays pixel-accurate.
+    fn set_sidebar_visible(&mut self, visible: bool, cx: &mut Context<Self>) {
+        if self.sidebar_visible == visible {
+            return;
+        }
+        self.sidebar_visible = visible;
+        let inset = self.sidebar_inset();
+        for tab in &self.tabs {
+            tab.update(cx, |ed, cx| {
+                ed.set_left_inset(inset);
+                cx.notify();
+            });
+        }
+        cx.notify();
+    }
+
+    /// Persists and applies the editor font size (0.5px steps, 10–28px).
+    fn set_font_size(&mut self, size: f32, cx: &mut Context<Self>) {
+        let clamped = (size.clamp(10.0, 28.0) * 2.0).round() / 2.0;
+        let current = self.config.settings().editor.font_size;
+        if (current - clamped).abs() < f32::EPSILON {
+            return;
+        }
+        if let Err(err) = self
+            .config
+            .set_user_value("editor.font_size", toml::Value::Float(clamped as f64))
+        {
+            self.push_notification(
+                format!("Failed to save font size: {err}"),
+                NotificationLevel::Error,
+                cx,
+            );
+            return;
+        }
+        let ed = self.config.settings().editor.clone();
+        for tab in &self.tabs {
+            tab.update(cx, |e, cx| e.update_settings(ed.clone(), cx));
+        }
+        self.settings_view
+            .update(cx, |sv, cx| sv.sync_from_store(&self.config, cx));
+        cx.notify();
+    }
+
+    /// Applies a full settings patch from the Settings view: persists every value
+    /// to the layered config in a single write, pushes editor settings to open
+    /// tabs, and refreshes dependent views (tree, LSP clients, status bar).
+    fn apply_settings_patch(&mut self, p: &SettingsPatch, cx: &mut Context<Self>) {
+        // UI scale first (persists ui.ui_scale itself).
+        self.set_ui_scale(p.ui_scale, cx);
+
+        let nav_mode = format!("{:?}", p.navigation_mode).to_lowercase();
+        let nav_tabs = toml::Value::Array(
+            p.nav_tabs
+                .iter()
+                .map(|s| toml::Value::String(s.clone()))
+                .collect(),
+        );
+        let values: Vec<(&str, toml::Value)> = vec![
+            (
+                "editor.font_size",
+                toml::Value::Float(p.font_size.clamp(10.0, 28.0) as f64),
+            ),
+            (
+                "editor.line_height",
+                toml::Value::Float(p.line_height.clamp(1.0, 2.4) as f64),
+            ),
+            ("editor.tab_size", toml::Value::Integer(p.tab_size as i64)),
+            (
+                "editor.trim_trailing_whitespace",
+                toml::Value::Boolean(p.trim_trailing_whitespace),
+            ),
+            (
+                "editor.relative_line_numbers",
+                toml::Value::Boolean(p.relative_line_numbers),
+            ),
+            ("editor.auto_pairs", toml::Value::Boolean(p.auto_pairs)),
+            (
+                "editor.navigation_mode",
+                toml::Value::String(nav_mode),
+            ),
+            ("ui.nav_tabs", nav_tabs),
+            (
+                "ui.top_bar_breadcrumb",
+                toml::Value::Boolean(p.top_bar_breadcrumb),
+            ),
+            ("ui.top_bar_search", toml::Value::Boolean(p.top_bar_search)),
+            ("ui.top_bar_stats", toml::Value::Boolean(p.top_bar_stats)),
+            (
+                "ui.top_bar_actions",
+                toml::Value::Boolean(p.top_bar_actions),
+            ),
+            (
+                "ui.top_bar_quick_actions",
+                toml::Value::Boolean(p.top_bar_quick_actions),
+            ),
+            ("lsp.enabled", toml::Value::Boolean(p.lsp_enabled)),
+            ("git.enabled", toml::Value::Boolean(p.git_enabled)),
+            (
+                "git.show_gutter_diff",
+                toml::Value::Boolean(p.git_show_gutter_diff),
+            ),
+            (
+                "git.auto_fetch",
+                toml::Value::Boolean(p.git_auto_fetch),
+            ),
+            (
+                "git.confirm_sync",
+                toml::Value::Boolean(p.git_confirm_sync),
+            ),
+            (
+                "files.show_hidden",
+                toml::Value::Boolean(p.files_show_hidden),
+            ),
+            (
+                "files.respect_gitignore",
+                toml::Value::Boolean(p.files_respect_gitignore),
+            ),
+        ];
+        if let Err(err) = self.config.set_user_values(&values) {
+            self.push_notification(
+                format!("Failed to save settings: {err}"),
+                NotificationLevel::Error,
+                cx,
+            );
+        }
+
+        // Push editor settings to every open tab.
+        let ed = self.config.settings().editor.clone();
+        for tab in &self.tabs {
+            tab.update(cx, |e, cx| e.update_settings(ed.clone(), cx));
+        }
+
+        // LSP enable / disable across open tabs.
+        if !p.lsp_enabled {
+            for tab in &self.tabs {
+                tab.update(cx, |e, _| e.set_lsp_client(None));
+            }
+        } else if self.config.settings().lsp.enabled {
+            let root = self.workspace_root.clone();
+            let clients: Vec<_> = self
+                .tabs
+                .iter()
+                .filter_map(|tab| {
+                    let r = tab.read(cx);
+                    if r.has_lsp() || r.path().is_none() {
+                        return None;
+                    }
+                    let lang_id = r.lsp_language_id()?;
+                    self.lsp_manager
+                        .client_for(lang_id, &root)
+                        .map(|c| (tab.clone(), c))
+                })
+                .collect();
+            for (tab, client) in clients {
+                tab.update(cx, |ed, _| ed.set_lsp_client(Some(client)));
+            }
+        }
+
+        // File listing flags drive the explorer tree.
+        self.rebuild_tree();
+
+        // Keep the Settings view's TOML inspector in step with the store.
+        self.settings_view
+            .update(cx, |sv, cx| sv.sync_from_store(&self.config, cx));
+        cx.notify();
+    }
+
+    /// Switches the whole shell to a different workspace root (Open Folder / Workspace).
+    fn switch_workspace(&mut self, raw: PathBuf, cx: &mut Context<Self>) {
+        let root = if raw.is_dir() {
+            std::fs::canonicalize(&raw).unwrap_or(raw)
+        } else {
+            self.push_notification(
+                format!("Not a directory: {}", raw.display()),
+                NotificationLevel::Error,
+                cx,
+            );
+            return;
+        };
+        if root == self.workspace_root {
+            self.push_notification(
+                "This folder is already the active workspace".into(),
+                NotificationLevel::Info,
+                cx,
+            );
+            return;
+        }
+
+        self.workspace_root = root.clone();
+
+        // Layered config follows the new root (user-level settings carry over).
+        self.config = ConfigStore::load(Some(&root));
+
+        // Theme + scale declared by the new workspace.
+        let theme_name = self.config.settings().ui.theme.clone();
+        let scale = self.config.settings().ui.ui_scale.clamp(0.75, 1.75);
+        let mut resolved = cx.global::<ThemeRegistry>().resolve(&theme_name);
+        resolved.ui_scale = scale;
+        Theme::set_global(resolved, cx);
+
+        // Directory tree.
+        self.expanded_dirs.clear();
+        self.expanded_dirs.insert(root.clone());
+        self.rebuild_tree();
+
+        // Views bound to the workspace root.
+        self.file_finder
+            .update(cx, |ff, cx| ff.set_roots(vec![root.clone()], cx));
+        self.git_view.update(cx, |g, cx| g.set_root(&root, cx));
+        self.git_head = self.git_view.read(cx).head_info().clone();
+        self.git_changes = self.git_view.read(cx).change_count();
+        let lsp_manager = self.lsp_manager.clone();
+        let lsp_root = root.clone();
+        self.lsp_view = cx.new(move |cx| LspView::new(lsp_manager, &lsp_root, cx));
+        self.terminal_view = None;
+        self.terminal_visible = false;
+
+        // Settings + extension host context.
+        self.settings_view
+            .update(cx, |sv, cx| sv.sync_from_store(&self.config, cx));
+        self.extension_host.set_context(EditorContext {
+            workspace_root: Some(root.clone()),
+            active_path: None,
+            active_text: None,
+            selection: None,
+        });
+
+        blur_workspace::persistence::push_recent(&root);
+
+        self.mode = WorkspaceMode::Editor;
+        self.push_notification(
+            format!("Opened workspace {}", root.display()),
+            NotificationLevel::Success,
+            cx,
+        );
+        cx.notify();
+    }
+
+    /// Resolves a typed path against the active workspace root (supports `~/`).
+    fn resolve_workspace_path(&self, raw: &str) -> PathBuf {
+        let trimmed = raw.trim();
+        if let Some(rest) = trimmed.strip_prefix("~/") {
+            if let Ok(home) = std::env::var("HOME") {
+                return PathBuf::from(home).join(rest);
+            }
+        }
+        let p = Path::new(trimmed);
+        if p.is_absolute() {
+            p.to_path_buf()
+        } else {
+            self.workspace_root.join(p)
+        }
+    }
+
     fn create_new_file(&mut self, raw_path: &str, cx: &mut Context<Self>) {
         let trimmed = raw_path.trim();
         if trimmed.is_empty() {
             let lr = self.lang_registry.clone();
             let ed_settings = self.config.settings().editor.clone();
+            let inset = self.sidebar_inset();
             let entity = cx.new(|cx| EditorView::new(Buffer::new(), lr, ed_settings, cx));
+            entity.update(cx, |ed, _| ed.set_left_inset(inset));
             self.subscribe_editor(&entity, cx);
             self.tabs.push(entity);
             self.active_tab = self.tabs.len() - 1;
@@ -1090,6 +1382,150 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                 self.create_new_file(&query, cx);
                 cx.notify();
             }
+            OverlayMode::OpenFile => {
+                self.overlay = OverlayMode::None;
+                let trimmed = query.trim().to_string();
+                if trimmed.is_empty() {
+                    self.push_notification(
+                        "Type a file path to open (Enter to cancel)".into(),
+                        NotificationLevel::Info,
+                        cx,
+                    );
+                } else {
+                    let path = self.resolve_workspace_path(&trimmed);
+                    if path.is_file() {
+                        self.open_path(path, None, cx);
+                        self.mode = WorkspaceMode::Editor;
+                    } else {
+                        self.push_notification(
+                            format!("No such file: {}", path.display()),
+                            NotificationLevel::Error,
+                            cx,
+                        );
+                    }
+                }
+                cx.notify();
+            }
+            OverlayMode::OpenFolder => {
+                self.overlay = OverlayMode::None;
+                let trimmed = query.trim().to_string();
+                if trimmed.is_empty() {
+                    self.push_notification(
+                        "Type a folder path to open (Enter to cancel)".into(),
+                        NotificationLevel::Info,
+                        cx,
+                    );
+                } else {
+                    let path = self.resolve_workspace_path(&trimmed);
+                    self.switch_workspace(path, cx);
+                }
+                cx.notify();
+            }
+            OverlayMode::OpenWorkspace => {
+                self.overlay = OverlayMode::None;
+                let trimmed = query.trim().to_string();
+                if trimmed.is_empty() {
+                    // Empty query opens the most recent workspace.
+                    if let Some(recent) = blur_workspace::persistence::recent_workspaces()
+                        .into_iter()
+                        .next()
+                    {
+                        self.switch_workspace(recent, cx);
+                    } else {
+                        self.push_notification(
+                            "No recent workspaces — type a folder or .blur-workspace.json path"
+                                .into(),
+                            NotificationLevel::Info,
+                            cx,
+                        );
+                    }
+                } else {
+                    let path = self.resolve_workspace_path(&trimmed);
+                    if path.is_file()
+                        && path
+                            .extension()
+                            .and_then(|e| e.to_str())
+                            .map(|e| e.eq_ignore_ascii_case("json"))
+                            .unwrap_or(false)
+                    {
+                        // Workspace file: JSON `WorkspaceState` with a `roots` list.
+                        match std::fs::read_to_string(&path)
+                            .map_err(|e| e.to_string())
+                            .and_then(|raw| {
+                                serde_json::from_str::<blur_workspace::persistence::WorkspaceState>(
+                                    &raw,
+                                )
+                                .map_err(|e| e.to_string())
+                            }) {
+                            Ok(state) => {
+                                if let Some(root) = state.roots.into_iter().next() {
+                                    self.switch_workspace(root, cx);
+                                } else {
+                                    self.push_notification(
+                                        "Workspace file declares no roots".into(),
+                                        NotificationLevel::Error,
+                                        cx,
+                                    );
+                                }
+                            }
+                            Err(err) => {
+                                self.push_notification(
+                                    format!("Invalid workspace file: {err}"),
+                                    NotificationLevel::Error,
+                                    cx,
+                                );
+                            }
+                        }
+                    } else {
+                        self.switch_workspace(path, cx);
+                    }
+                }
+                cx.notify();
+            }
+            OverlayMode::NewWorkspace => {
+                self.overlay = OverlayMode::None;
+                let trimmed = query.trim().to_string();
+                if trimmed.is_empty() {
+                    self.push_notification(
+                        "Type a name or path for the new workspace".into(),
+                        NotificationLevel::Info,
+                        cx,
+                    );
+                } else {
+                    let path = self.resolve_workspace_path(&trimmed);
+                    if path.exists() && !path.is_dir() {
+                        self.push_notification(
+                            format!("{} already exists and is not a folder", path.display()),
+                            NotificationLevel::Error,
+                            cx,
+                        );
+                    } else {
+                        match std::fs::create_dir_all(&path) {
+                            Ok(()) => {
+                                // Seed a workspace-level config so layered settings work.
+                                let blur_dir = path.join(".blur");
+                                let cfg = blur_dir.join("config.toml");
+                                if !cfg.exists() {
+                                    let _ = std::fs::create_dir_all(&blur_dir);
+                                    let _ = std::fs::write(
+                                        &cfg,
+                                        "# Blur workspace configuration\n# Overrides ~/.config/blur/config.toml for this workspace.\n",
+                                    );
+                                }
+                                self.switch_workspace(path, cx);
+                            }
+                            Err(err) => {
+                                self.push_notification(
+                                    format!("Failed to create workspace: {err}"),
+                                    NotificationLevel::Error,
+                                    cx,
+                                );
+                            }
+                        }
+                    }
+                }
+                cx.notify();
+            }
             OverlayMode::None => {}
         }
     }
@@ -1101,7 +1537,35 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                 self.palette_idx = 0;
                 self.palette_input.update(cx, |inp, cx| inp.clear(cx));
             }
-            "workspace.toggle_sidebar" => self.sidebar_visible = !self.sidebar_visible,
+            "workspace.command_palette" => {
+                self.overlay = OverlayMode::CommandPalette;
+                self.palette_idx = 0;
+                self.palette_input.update(cx, |inp, cx| inp.clear(cx));
+            }
+            "workspace.open_file" => {
+                self.overlay = OverlayMode::OpenFile;
+                self.palette_idx = 0;
+                self.palette_input.update(cx, |inp, cx| inp.clear(cx));
+            }
+            "workspace.open_folder" => {
+                self.overlay = OverlayMode::OpenFolder;
+                self.palette_idx = 0;
+                self.palette_input.update(cx, |inp, cx| inp.clear(cx));
+            }
+            "workspace.open_workspace" => {
+                self.overlay = OverlayMode::OpenWorkspace;
+                self.palette_idx = 0;
+                self.palette_input.update(cx, |inp, cx| inp.clear(cx));
+            }
+            "workspace.new_workspace" => {
+                self.overlay = OverlayMode::NewWorkspace;
+                self.palette_idx = 0;
+                self.palette_input.update(cx, |inp, cx| inp.clear(cx));
+            }
+            "workspace.toggle_sidebar" => {
+                let next = !self.sidebar_visible;
+                self.set_sidebar_visible(next, cx);
+            }
             "workspace.toggle_terminal" | "workspace.toggle_panel" => {
                 self.terminal_visible = !self.terminal_visible;
                 if self.terminal_visible && self.terminal_view.is_none() {
@@ -1111,15 +1575,26 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
             }
             "workspace.zen_mode" => {
                 self.zen_mode = !self.zen_mode;
-                self.sidebar_visible = !self.zen_mode;
+                let next = !self.zen_mode;
+                self.set_sidebar_visible(next, cx);
             }
             "workspace.theme_selector" => {
                 self.overlay = OverlayMode::ThemeSwitcher;
                 self.palette_idx = 0;
             }
             "workspace.view_editor" => self.mode = WorkspaceMode::Editor,
-            "workspace.file_finder" => self.mode = WorkspaceMode::FileFinder,
-            "workspace.project_search" => self.mode = WorkspaceMode::FileFinder,
+            "workspace.file_finder" => {
+                self.mode = WorkspaceMode::FileFinder;
+                self.file_finder.update(cx, |ff, cx| {
+                    ff.set_mode_no_focus(FinderMode::Files, cx)
+                });
+            }
+            "workspace.project_search" => {
+                self.mode = WorkspaceMode::FileFinder;
+                self.file_finder.update(cx, |ff, cx| {
+                    ff.set_mode_no_focus(FinderMode::ProjectSearch, cx)
+                });
+            }
             "workspace.view_git" => {
                 self.mode = WorkspaceMode::VersionControl;
                 self.git_view.update(cx, |g, cx| g.refresh(cx));
@@ -1137,20 +1612,81 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                     let _ = tab.update(cx, |ed, cx| ed.save(cx));
                 }
             }
+            "editor.save_all" => {
+                let tabs = self.tabs.clone();
+                for tab in tabs {
+                    let _ = tab.update(cx, |ed, cx| ed.save(cx));
+                }
+            }
+            "editor.close_tab" => {
+                if !self.tabs.is_empty() {
+                    if let Some(tab) = self.tabs.get(self.active_tab).cloned() {
+                        if tab.read(cx).is_dirty() {
+                            let _ = tab.update(cx, |ed, cx| ed.save(cx));
+                        }
+                    }
+                    self.tabs.remove(self.active_tab);
+                    if self.active_tab >= self.tabs.len() {
+                        self.active_tab = self.tabs.len().saturating_sub(1);
+                    }
+                }
+            }
+            "editor.next_tab" => {
+                if !self.tabs.is_empty() {
+                    self.active_tab = (self.active_tab + 1) % self.tabs.len();
+                }
+            }
+            "editor.prev_tab" => {
+                if !self.tabs.is_empty() {
+                    self.active_tab = (self.active_tab + self.tabs.len() - 1) % self.tabs.len();
+                }
+            }
             "editor.find" => {
                 if let Some(tab) = self.tabs.get(self.active_tab).cloned() {
                     tab.update(cx, |ed, cx| ed.toggle_find(cx));
                 }
             }
+            "editor.replace" => {
+                if let Some(tab) = self.tabs.get(self.active_tab).cloned() {
+                    tab.update(cx, |ed, cx| ed.open_replace(cx));
+                }
+            }
+            "editor.goto_line" => {
+                if let Some(tab) = self.tabs.get(self.active_tab).cloned() {
+                    tab.update(cx, |ed, cx| ed.open_goto_line(cx));
+                }
+            }
+            "editor.format" => {
+                if let Some(tab) = self.tabs.get(self.active_tab).cloned() {
+                    tab.update(cx, |ed, cx| ed.trigger_format(cx));
+                }
+            }
+            "editor.increase_font_size" => {
+                let cur = self.config.settings().editor.font_size;
+                self.set_font_size(cur + 0.5, cx);
+            }
+            "editor.decrease_font_size" => {
+                let cur = self.config.settings().editor.font_size;
+                self.set_font_size(cur - 0.5, cx);
+            }
+            "editor.reset_font_size" => self.set_font_size(13.5, cx),
             "workspace.quit" => cx.quit(),
             other => {
                 // Delegate to Lua extension host if registered by an extension
                 if let Err(err) = self.extension_host.run_command(other) {
-                    self.push_notification(
-                        format!("Command `{other}`: {err}"),
-                        NotificationLevel::Warning,
-                        cx,
-                    );
+                    // Core commands the shell does not dispatch (editor-internal
+                    // actions like copy/undo, view-level git ops) must not surface
+                    // as errors — they either run in-editor or are display-only.
+                    let is_core = ["editor.", "git.", "task.", "workspace."]
+                        .iter()
+                        .any(|p| other.starts_with(p));
+                    if !is_core {
+                        self.push_notification(
+                            format!("Command `{other}`: {err}"),
+                            NotificationLevel::Warning,
+                            cx,
+                        );
+                    }
                 } else {
                     for req in self.extension_host.drain_requests() {
                         if let HostRequest::Notify { message, .. } = req {
@@ -1184,18 +1720,38 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                     self.open_overlay(OverlayMode::NewFile, window, cx);
                     return;
                 }
+                "o" if !shift => {
+                    self.open_overlay(OverlayMode::OpenFolder, window, cx);
+                    return;
+                }
+                // Font size: Ctrl+= / Ctrl++ up, Ctrl+- down, Ctrl+0 reset.
+                // Hold Alt for the UI scale equivalents (Ctrl+Alt+= / - / 0).
                 "=" | "+" => {
-                    let next = Theme::global(cx).ui_scale + 0.1;
-                    self.set_ui_scale(next, cx);
+                    if ks.modifiers.alt {
+                        let next = Theme::global(cx).ui_scale + 0.1;
+                        self.set_ui_scale(next, cx);
+                    } else {
+                        let cur = self.config.settings().editor.font_size;
+                        self.set_font_size(cur + 0.5, cx);
+                    }
                     return;
                 }
                 "-" => {
-                    let next = Theme::global(cx).ui_scale - 0.1;
-                    self.set_ui_scale(next, cx);
+                    if ks.modifiers.alt {
+                        let next = Theme::global(cx).ui_scale - 0.1;
+                        self.set_ui_scale(next, cx);
+                    } else {
+                        let cur = self.config.settings().editor.font_size;
+                        self.set_font_size(cur - 0.5, cx);
+                    }
                     return;
                 }
                 "0" => {
-                    self.set_ui_scale(1.0, cx);
+                    if ks.modifiers.alt {
+                        self.set_ui_scale(1.0, cx);
+                    } else {
+                        self.set_font_size(13.5, cx);
+                    }
                     return;
                 }
                 "p" if shift => {
@@ -1218,8 +1774,8 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                     return;
                 }
                 "b" => {
-                    self.sidebar_visible = !self.sidebar_visible;
-                    cx.notify();
+                    let next = !self.sidebar_visible;
+                    self.set_sidebar_visible(next, cx);
                     return;
                 }
                 "`" => {
@@ -1292,15 +1848,20 @@ impl Render for AppShell {
             )
         };
 
-        let nav_tabs = [
-            (WorkspaceMode::Editor, "Editor"),
-            (WorkspaceMode::FileFinder, "File Finder"),
-            (WorkspaceMode::VersionControl, "Version Control"),
-            (WorkspaceMode::ProtocolsLsp, "Protocols & LSP"),
-            (WorkspaceMode::Utilities, "Utilities"),
-            (WorkspaceMode::Theme, "Theme"),
-            (WorkspaceMode::Settings, "Settings"),
-        ];
+        // Customizable header: only tabs enabled in Settings → Tabs & Page Navigation.
+        let ui_cfg = self.config.settings().ui.clone();
+        let nav_tabs: Vec<(WorkspaceMode, &str, &str)> = [
+            (WorkspaceMode::Editor, "editor", "Editor"),
+            (WorkspaceMode::FileFinder, "file_finder", "File Finder"),
+            (WorkspaceMode::VersionControl, "version_control", "Version Control"),
+            (WorkspaceMode::ProtocolsLsp, "protocols_lsp", "Protocols & LSP"),
+            (WorkspaceMode::Utilities, "utilities", "Utilities"),
+            (WorkspaceMode::Theme, "theme", "Theme"),
+            (WorkspaceMode::Settings, "settings", "Settings"),
+        ]
+        .into_iter()
+        .filter(|(_, key, _)| ui_cfg.nav_tabs.iter().any(|k| k == key))
+        .collect();
 
         let workspace_name = self
             .workspace_root
@@ -1425,74 +1986,78 @@ impl Render for AppShell {
                             .items_center()
                             .justify_between()
                             .gap(px(16.0))
-                            // Left: Breadcrumb ribbon
-                            .child(
-                                div()
-                                    .flex()
-                                    .items_center()
-                                    .gap(px(8.0))
-                                    .text_size(px(12.5))
-                                    .child(
-                                        div()
-                                            .text_color(Theme::with_alpha(theme.text_muted, 0.7))
-                                            .child(active_rel_dir.clone()),
-                                    )
-                                    .child(
-                                        div()
-                                            .text_color(Theme::with_alpha(theme.text_muted, 0.35))
-                                            .child("/"),
-                                    )
-                                    .child(
-                                        div()
-                                            .text_color(theme.text)
-                                            .font_weight(FontWeight::MEDIUM)
-                                            .child(active_title.clone()),
-                                    )
-                                    .child(
-                                        div()
-                                            .text_color(Theme::with_alpha(theme.text_muted, 0.35))
-                                            .child("·"),
-                                    )
-                                    .child(
-                                        div()
-                                            .text_size(px(11.5))
-                                            .text_color(Theme::with_alpha(theme.text_muted, 0.6))
-                                            .child(if active_title == "protocol.rs" {
-                                                "async stream router".to_string()
-                                            } else {
-                                                active_lang.clone()
-                                            }),
-                                    ),
-                            )
+                            // Left: Breadcrumb ribbon (customizable)
+                            .when(ui_cfg.top_bar_breadcrumb, |d| {
+                                d.child(
+                                    div()
+                                        .flex()
+                                        .items_center()
+                                        .gap(px(8.0))
+                                        .text_size(px(12.5))
+                                        .child(
+                                            div()
+                                                .text_color(Theme::with_alpha(theme.text_muted, 0.7))
+                                                .child(active_rel_dir.clone()),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_color(Theme::with_alpha(theme.text_muted, 0.35))
+                                                .child("/"),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_color(theme.text)
+                                                .font_weight(FontWeight::MEDIUM)
+                                                .child(active_title.clone()),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_color(Theme::with_alpha(theme.text_muted, 0.35))
+                                                .child("·"),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_size(px(11.5))
+                                                .text_color(Theme::with_alpha(theme.text_muted, 0.6))
+                                                .child(if active_title == "protocol.rs" {
+                                                    "async stream router".to_string()
+                                                } else {
+                                                    active_lang.clone()
+                                                }),
+                                        ),
+                                )
+                            })
                             // Center: Serene Command Palette Trigger ("Go to symbol, line, or action...")
-                            .child(
-                                div()
-                                    .id("ed-center-search")
-                                    .w(px(320.0))
-                                    .h(px(32.0))
-                                    .px(px(10.0))
-                                    .rounded(px(4.0))
-                                    .bg(theme.surface_panel)
-                                    .hover(|s| s.bg(theme.surface_elevated))
-                                    .cursor_pointer()
-                                    .flex()
-                                    .items_center()
-                                    .justify_between()
-                                    .on_mouse_down(
-                                        MouseButton::Left,
-                                        cx.listener(|this, _, window, cx| {
-                                            this.open_overlay(OverlayMode::CommandPalette, window, cx);
-                                        }),
-                                    )
-                                    .child(
-                                        div()
-                                            .text_size(px(12.0))
-                                            .text_color(Theme::with_alpha(theme.text_muted, 0.55))
-                                            .child("Go to symbol, line, or action..."),
-                                    )
-                                    .child(kbd("⌘P", &theme)),
-                            )
-                            // Right: Ambient Focal Stats + Zen/Preview/Terminal triggers
+                            .when(ui_cfg.top_bar_search, |d| {
+                                d.child(
+                                    div()
+                                        .id("ed-center-search")
+                                        .w(px(320.0))
+                                        .h(px(32.0))
+                                        .px(px(10.0))
+                                        .rounded(px(4.0))
+                                        .bg(theme.surface_panel)
+                                        .hover(|s| s.bg(theme.surface_elevated))
+                                        .cursor_pointer()
+                                        .flex()
+                                        .items_center()
+                                        .justify_between()
+                                        .on_mouse_down(
+                                            MouseButton::Left,
+                                            cx.listener(|this, _, window, cx| {
+                                                this.open_overlay(OverlayMode::CommandPalette, window, cx);
+                                            }),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_size(px(12.0))
+                                                .text_color(Theme::with_alpha(theme.text_muted, 0.55))
+                                                .child("Go to symbol, line, or action..."),
+                                        )
+                                        .child(kbd("⌘P", &theme)),
+                                )
+                            })
+                            // Right: Ambient Focal Stats + Zen/Preview/Terminal triggers (customizable)
                             .child(
                                 div()
                                     .flex()
@@ -1500,40 +2065,44 @@ impl Render for AppShell {
                                     .gap(px(10.0))
                                     .text_size(px(11.5))
                                     .text_color(Theme::with_alpha(theme.text_muted, 0.65))
-                                    .child(format!("{active_lines} lines"))
-                                    .child("·")
-                                    .child(format!("{} tabs", self.tabs.len()))
-                                    .child(
-                                        button(
-                                            "ed-toggle-preview",
-                                            if self.preview_visible { "Preview ON" } else { "Preview" },
-                                            if self.preview_visible {
-                                                ButtonVariant::Primary
-                                            } else {
-                                                ButtonVariant::Ghost
-                                            },
-                                            &theme,
+                                    .when(ui_cfg.top_bar_stats, |d| {
+                                        d.child(format!("{active_lines} lines"))
+                                            .child("·")
+                                            .child(format!("{} tabs", self.tabs.len()))
+                                    })
+                                    .when(ui_cfg.top_bar_actions, |d| {
+                                        d.child(
+                                            button(
+                                                "ed-toggle-preview",
+                                                if self.preview_visible { "Preview ON" } else { "Preview" },
+                                                if self.preview_visible {
+                                                    ButtonVariant::Primary
+                                                } else {
+                                                    ButtonVariant::Ghost
+                                                },
+                                                &theme,
+                                            )
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                this.preview_visible = !this.preview_visible;
+                                                cx.notify();
+                                            })),
                                         )
-                                        .on_click(cx.listener(|this, _, _, cx| {
-                                            this.preview_visible = !this.preview_visible;
-                                            cx.notify();
-                                        })),
-                                    )
-                                    .child(
-                                        button(
-                                            "ed-toggle-term",
-                                            "Terminal",
-                                            if self.terminal_visible {
-                                                ButtonVariant::Primary
-                                            } else {
-                                                ButtonVariant::Ghost
-                                            },
-                                            &theme,
+                                        .child(
+                                            button(
+                                                "ed-toggle-term",
+                                                "Terminal",
+                                                if self.terminal_visible {
+                                                    ButtonVariant::Primary
+                                                } else {
+                                                    ButtonVariant::Ghost
+                                                },
+                                                &theme,
+                                            )
+                                            .on_click(cx.listener(|this, _, window, cx| {
+                                                this.toggle_terminal(window, cx);
+                                            })),
                                         )
-                                        .on_click(cx.listener(|this, _, window, cx| {
-                                            this.toggle_terminal(window, cx);
-                                        })),
-                                    ),
+                                    }),
                             ),
                     )
                     // Editor + optional native viewer split
@@ -1575,11 +2144,12 @@ impl Render for AppShell {
                 let matches = self.commands.fuzzy_search(&q);
                 let items: Vec<_> = matches
                     .iter()
-                    .take(10)
+                    .take(12)
                     .enumerate()
                     .map(|(i, (cmd, _, _))| {
                         let active = i == self.palette_idx;
                         let cmd_id = cmd.id.clone();
+                        let (icon, icon_color) = command_icon(&cmd.id, &cmd.category, &theme);
                         list_row(("pal-cmd", i), active, &theme)
                             .h(px(34.0))
                             .on_mouse_down(
@@ -1594,6 +2164,21 @@ impl Render for AppShell {
                                     .flex()
                                     .items_center()
                                     .gap(px(8.0))
+                                    // Tinted icon chip (Stitch command-palette glyphs)
+                                    .child(
+                                        div()
+                                            .w(px(18.0))
+                                            .h(px(18.0))
+                                            .rounded(px(4.0))
+                                            .bg(Theme::with_alpha(icon_color, 0.14))
+                                            .flex()
+                                            .items_center()
+                                            .justify_center()
+                                            .text_size(px(11.0))
+                                            .font_weight(FontWeight::MEDIUM)
+                                            .text_color(icon_color)
+                                            .child(icon),
+                                    )
                                     .child(badge(cmd.category.clone(), BadgeTone::Neutral, &theme))
                                     .child(div().text_size(px(12.5)).child(cmd.title.clone())),
                             )
@@ -1718,13 +2303,160 @@ impl Render for AppShell {
                     }),
                 ))
             }
+            OverlayMode::OpenFile => {
+                let q = self.palette_input.read(cx).value().trim().to_string();
+                let preview = if q.is_empty() {
+                    "Type a file path (absolute, ~/…, or workspace-relative) and press Enter"
+                        .to_string()
+                } else {
+                    format!("Open: {}", self.resolve_workspace_path(&q).display())
+                };
+                let rows = vec![list_row("open-file-hint", true, &theme)
+                    .h(px(36.0))
+                    .child(
+                        div()
+                            .text_size(theme.scaled(12.0))
+                            .text_color(theme.text_secondary)
+                            .child(preview),
+                    )];
+                Some(render_modal_shell(
+                    "Open File:",
+                    self.palette_input.clone(),
+                    rows,
+                    &theme,
+                    cx.listener(|this, _, _, cx| {
+                        this.overlay = OverlayMode::None;
+                        cx.notify();
+                    }),
+                ))
+            }
+            OverlayMode::OpenFolder => {
+                let q = self.palette_input.read(cx).value().trim().to_string();
+                let preview = if q.is_empty() {
+                    "Type a folder path and press Enter to open it as the workspace".to_string()
+                } else {
+                    format!("Open folder: {}", self.resolve_workspace_path(&q).display())
+                };
+                let rows = vec![list_row("open-folder-hint", true, &theme)
+                    .h(px(36.0))
+                    .child(
+                        div()
+                            .text_size(theme.scaled(12.0))
+                            .text_color(theme.text_secondary)
+                            .child(preview),
+                    )];
+                Some(render_modal_shell(
+                    "Open Folder:",
+                    self.palette_input.clone(),
+                    rows,
+                    &theme,
+                    cx.listener(|this, _, _, cx| {
+                        this.overlay = OverlayMode::None;
+                        cx.notify();
+                    }),
+                ))
+            }
+            OverlayMode::OpenWorkspace => {
+                let q = self.palette_input.read(cx).value().trim().to_string();
+                let recents = blur_workspace::persistence::recent_workspaces();
+                let preview = if q.is_empty() {
+                    "Type a folder or .blur-workspace.json path · Enter opens the most recent"
+                        .to_string()
+                } else {
+                    format!("Open: {}", self.resolve_workspace_path(&q).display())
+                };
+                let mut rows: Vec<gpui::Stateful<gpui::Div>> = Vec::new();
+                rows.push(
+                    list_row("open-ws-hint", q.is_empty(), &theme)
+                        .h(px(32.0))
+                        .child(
+                            div()
+                                .text_size(theme.scaled(12.0))
+                                .text_color(theme.text_secondary)
+                                .child(preview),
+                        ),
+                );
+                for (i, recent) in recents.iter().take(6).enumerate() {
+                    let path = recent.clone();
+                    rows.push(
+                        list_row(("recent-ws", i), false, &theme)
+                            .h(px(30.0))
+                            .on_mouse_down(MouseButton::Left, cx.listener(move |this, _, _, cx| {
+                                this.overlay = OverlayMode::None;
+                                this.switch_workspace(path.clone(), cx);
+                            }))
+                            .child(
+                                div()
+                                    .flex()
+                                    .items_center()
+                                    .gap(px(8.0))
+                                    .child(
+                                        div()
+                                            .text_size(px(11.0))
+                                            .text_color(theme.warning)
+                                            .child("▸"),
+                                    )
+                                    .child(
+                                        div()
+                                            .text_size(theme.scaled(12.0))
+                                            .text_color(theme.text_secondary)
+                                            .child(recent.display().to_string()),
+                                    ),
+                            ),
+                    );
+                }
+                Some(render_modal_shell(
+                    "Open Workspace:",
+                    self.palette_input.clone(),
+                    rows,
+                    &theme,
+                    cx.listener(|this, _, _, cx| {
+                        this.overlay = OverlayMode::None;
+                        cx.notify();
+                    }),
+                ))
+            }
+            OverlayMode::NewWorkspace => {
+                let q = self.palette_input.read(cx).value().trim().to_string();
+                let preview = if q.is_empty() {
+                    "Type a name or path (e.g. my-project) and press Enter to create + open it"
+                        .to_string()
+                } else {
+                    format!(
+                        "Create workspace: {} (with .blur/config.toml)",
+                        self.resolve_workspace_path(&q).display()
+                    )
+                };
+                let rows = vec![list_row("new-ws-hint", true, &theme)
+                    .h(px(36.0))
+                    .child(
+                        div()
+                            .text_size(theme.scaled(12.0))
+                            .text_color(theme.text_secondary)
+                            .child(preview),
+                    )];
+                Some(render_modal_shell(
+                    "New Workspace:",
+                    self.palette_input.clone(),
+                    rows,
+                    &theme,
+                    cx.listener(|this, _, _, cx| {
+                        this.overlay = OverlayMode::None;
+                        cx.notify();
+                    }),
+                ))
+            }
         };
 
-        let branch_label = self
-            .git_head
-            .branch
-            .clone()
-            .unwrap_or_else(|| "main".to_string());
+        let git_enabled = self.config.settings().git.enabled;
+        let branch_label = if git_enabled {
+            self.git_head
+                .branch
+                .clone()
+                .unwrap_or_else(|| "main".to_string())
+        } else {
+            "git off".to_string()
+        };
 
         div()
             .relative()
@@ -1768,19 +2500,22 @@ impl Render for AppShell {
                                     .text_color(theme.text_muted)
                                     .child("B L U R"),
                             )
-                            .child(
-                                div()
-                                    .flex()
-                                    .items_center()
-                                    .gap(px(5.0))
-                                    .text_size(px(12.0))
-                                    .child(div().text_color(theme.text_muted).child(active_rel_dir))
-                                    .child(div().text_color(Theme::with_alpha(theme.text_muted, 0.4)).child("/"))
-                                    .child(div().text_color(theme.text_secondary).child(active_title.clone())),
-                            ),
+                            // Customizable: active-file breadcrumb (Settings → Tabs & Page Navigation)
+                            .when(ui_cfg.top_bar_breadcrumb, |d| {
+                                d.child(
+                                    div()
+                                        .flex()
+                                        .items_center()
+                                        .gap(px(5.0))
+                                        .text_size(px(12.0))
+                                        .child(div().text_color(theme.text_muted).child(active_rel_dir))
+                                        .child(div().text_color(Theme::with_alpha(theme.text_muted, 0.4)).child("/"))
+                                        .child(div().text_color(theme.text_secondary).child(active_title.clone())),
+                                )
+                            }),
                     )
                     // Center: Segmented Nav Pill (bg-surface-container-low #1a1b21, active #282a2f)
-                    .child(
+                    .when(!nav_tabs.is_empty(), |d| d.child(
                         div()
                             .flex()
                             .items_center()
@@ -1788,7 +2523,7 @@ impl Render for AppShell {
                             .p(px(4.0))
                             .rounded(px(4.0))
                             .bg(theme.surface_panel)
-                            .children(nav_tabs.into_iter().enumerate().map(|(i, (m, label))| {
+                            .children(nav_tabs.into_iter().enumerate().map(|(i, (m, label, _hint))| {
                                 let active = self.mode == m;
                                 div()
                                     .id(("nav-mode", i))
@@ -1825,9 +2560,10 @@ impl Render for AppShell {
                                     )
                                     .child(label)
                             })),
-                    )
+                    ))
                     // Right: ⌘P / ⌘K shortcut pill + circular theme switcher button
-                    .child(
+                    // Customizable: quick actions (Settings → Tabs & Page Navigation)
+                    .when(ui_cfg.top_bar_quick_actions, |d| d.child(
                         div()
                             .flex()
                             .items_center()
@@ -1881,7 +2617,7 @@ impl Render for AppShell {
                                     )
                                     .child("◐"),
                             ),
-                    ),
+                    )),
             )
             // Main Workspace Body (Serene 256px Drawer + Center + Optional Bottom Terminal)
             .child(
@@ -1986,8 +2722,7 @@ impl Render for AppShell {
                                                                 .on_mouse_down(
                                                                     MouseButton::Left,
                                                                     cx.listener(|this, _, _, cx| {
-                                                                        this.sidebar_visible = false;
-                                                                        cx.notify();
+                                                                        this.set_sidebar_visible(false, cx);
                                                                     }),
                                                                 )
                                                                 .child("|<"),
@@ -2160,12 +2895,16 @@ impl Render for AppShell {
                             ))
                             .child(status_item("|", Theme::with_alpha(theme.text_muted, 0.3)))
                             .child(status_item(
-                                if self.git_changes == 0 {
+                                if !git_enabled {
+                                    "git off".to_string()
+                                } else if self.git_changes == 0 {
                                     "clean".to_string()
                                 } else {
                                     format!("{} mod", self.git_changes)
                                 },
-                                if self.git_changes == 0 {
+                                if !git_enabled {
+                                    theme.text_muted
+                                } else if self.git_changes == 0 {
                                     theme.success
                                 } else {
                                     theme.warning
@@ -2192,6 +2931,41 @@ impl Render for AppShell {
                         ),
                 )
             })
+    }
+}
+
+/// Glyph + tint for a command-palette row (Stitch icon-per-command treatment).
+fn command_icon(id: &str, category: &str, theme: &Theme) -> (&'static str, gpui::Hsla) {
+    match id {
+        "workspace.new_file" | "workspace.open_file" => ("✎", theme.accent),
+        "workspace.file_finder" | "workspace.project_search" => ("⌕", theme.accent),
+        "workspace.open_folder" => ("▤", theme.warning),
+        "workspace.open_workspace" | "workspace.new_workspace" => ("⊞", theme.warning),
+        "workspace.theme_selector" => ("◐", theme.accent_secondary),
+        "workspace.command_palette" => ("◈", theme.accent),
+        "workspace.toggle_sidebar" | "workspace.toggle_panel" => ("≡", theme.text_secondary),
+        "workspace.toggle_terminal" | "workspace.new_terminal" => ("▸", theme.success),
+        "workspace.open_settings" | "workspace.view_settings" => ("⚙", theme.text_muted),
+        "workspace.zen_mode" => ("◉", theme.text_secondary),
+        "workspace.view_editor" => ("✎", theme.accent),
+        "workspace.view_git" => ("⎇", theme.success),
+        "workspace.view_lsp" => ("∿", theme.success),
+        "workspace.view_utilities" => ("✦", theme.warning),
+        "workspace.quit" => ("✕", theme.error),
+        "editor.increase_font_size" | "editor.decrease_font_size" | "editor.reset_font_size" => {
+            ("A", theme.accent)
+        }
+        _ if id.starts_with("editor.") => ("✎", theme.accent),
+        _ if id.starts_with("git.") => ("⎇", theme.success),
+        _ if id.starts_with("task.") => ("▷", theme.warning),
+        _ if id.starts_with("workspace.") => ("◈", theme.accent),
+        _ => match category {
+            "Editor" => ("✎", theme.accent),
+            "Git" => ("⎇", theme.success),
+            "Tasks" => ("▷", theme.warning),
+            "Workspace" => ("◈", theme.accent),
+            _ => ("◈", theme.text_muted),
+        },
     }
 }
 
@@ -2278,24 +3052,35 @@ fn render_modal_shell(
         .justify_center()
         .pt(px(86.0))
         .on_mouse_down(MouseButton::Left, on_dismiss)
+        // Frosted-glass haze: an extra translucent veil over the app content so the
+        // palette reads as a blurred backdrop (GPUI has no backdrop-filter; this is
+        // the closest native approximation — dimmed, softened content behind glass).
+        .child(
+            div()
+                .absolute()
+                .inset_0()
+                .bg(Theme::with_alpha(theme.canvas, 0.45)),
+        )
         .child(
             div()
                 .id("modal-box")
                 .w(px(620.0))
                 .max_h(px(460.0))
                 .rounded(px(8.0))
-                .bg(theme.surface_panel)
+                // Translucent panel: content behind ghosts through like frosted glass.
+                .bg(Theme::with_alpha(theme.surface_panel, 0.93))
                 .border_1()
-                .border_color(theme.border_strong)
+                .border_color(Theme::with_alpha(theme.border_strong, 0.75))
                 .flex()
                 .flex_col()
                 .overflow_hidden()
-                .on_mouse_down(MouseButton::Left, |_, _, _| {})
+                // Keep clicks inside the palette from bubbling to the dismiss scrim.
+                .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
                 .child(
                     div()
                         .h(px(48.0))
                         .px(px(14.0))
-                        .bg(theme.canvas)
+                        .bg(Theme::with_alpha(theme.canvas, 0.88))
                         .border_b_1()
                         .border_color(theme.border)
                         .flex()
@@ -2325,7 +3110,7 @@ fn render_modal_shell(
                     div()
                         .h(px(32.0))
                         .px(px(14.0))
-                        .bg(theme.canvas)
+                        .bg(Theme::with_alpha(theme.canvas, 0.88))
                         .border_t_1()
                         .border_color(theme.border)
                         .flex()

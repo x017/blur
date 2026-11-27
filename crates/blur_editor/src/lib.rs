@@ -92,6 +92,10 @@ pub struct EditorView {
     scroll_line: usize,
     scroll_col: usize,
     visible_lines: usize,
+    /// Distance (px) between the window's left edge and this editor's left edge
+    /// (i.e. the file-explorer sidebar width when it is visible). Used to map
+    /// mouse positions to text columns accurately.
+    left_inset: f32,
 
     // Mouse selection state
     is_dragging: bool,
@@ -180,6 +184,7 @@ impl EditorView {
             scroll_line: 0,
             scroll_col: 0,
             visible_lines: 36,
+            left_inset: 256.0,
             is_dragging: false,
             last_click_at: None,
             last_click_line: 0,
@@ -283,6 +288,11 @@ impl EditorView {
             NavigationMode::Helix => "HELIX",
             NavigationMode::Standard => "NORMAL",
         }
+    }
+
+    /// Updates the window-space left inset (sidebar width) used for mouse → column mapping.
+    pub fn set_left_inset(&mut self, inset: f32) {
+        self.left_inset = inset.max(0.0);
     }
 
     pub fn update_settings(&mut self, settings: EditorSettings, cx: &mut Context<Self>) {
@@ -1552,10 +1562,9 @@ impl Render for EditorView {
         let is_block_cursor = self.settings.navigation_mode == NavigationMode::Vim
             && self.vim.mode != VimMode::Insert;
 
-        // Calculate approximate code column origin X for mouse click column mapping
-        let vp_w = f32::from(window.viewport_size().width);
-        let content_area_w = (vp_w - 256.0 - 80.0).max(400.0);
-        let centered_left = 256.0 + 40.0 + ((content_area_w - 840.0).max(0.0) / 2.0) + 64.0;
+        // Window-space X of the first code column for mouse click column mapping:
+        // sidebar inset + 40px content padding + 58px gutter + 8px text padding.
+        let text_origin_x = self.left_inset + 40.0 + 58.0 + 8.0;
 
         let mut rows = Vec::with_capacity(display_lines.len());
         let mut span_cursor = 0usize;
@@ -1792,14 +1801,14 @@ impl Render for EditorView {
                 .on_mouse_down(
                     MouseButton::Left,
                     cx.listener(move |this, ev: &MouseDownEvent, window, cx| {
-                        let rel_x = (f32::from(ev.position.x) - centered_left).max(0.0);
+                        let rel_x = (f32::from(ev.position.x) - text_origin_x).max(0.0);
                         let col = (rel_x / approx_char_w).round() as usize;
                         this.handle_line_mouse_down(line_idx, col, ev, window, cx);
                     }),
                 )
                 .on_mouse_move(cx.listener(move |this, ev: &MouseMoveEvent, _, cx| {
                     if this.is_dragging {
-                        let rel_x = (f32::from(ev.position.x) - centered_left).max(0.0);
+                        let rel_x = (f32::from(ev.position.x) - text_origin_x).max(0.0);
                         let col = (rel_x / approx_char_w).round() as usize;
                         this.handle_line_mouse_move(line_idx, col, cx);
                     }
@@ -2024,56 +2033,6 @@ impl Render for EditorView {
             }
         }
 
-        // Bottom Soft Thought Marker: Quiet Reflection Note (1:1 Stitch Focused Editor)
-        if last_vis_line + 3 >= total_lines {
-            rows.push(
-                div()
-                    .mt(px(28.0))
-                    .p(px(14.0))
-                    .rounded(px(4.0))
-                    .bg(Theme::with_alpha(theme.canvas, 0.65))
-                    .flex()
-                    .items_start()
-                    .gap(px(14.0))
-                    .child(
-                        div()
-                            .mt(px(2.0))
-                            .text_size(px(14.0))
-                            .text_color(Theme::with_alpha(theme.text_muted, 0.45))
-                            .child("✽"),
-                    )
-                    .child(
-                        div()
-                            .flex()
-                            .flex_col()
-                            .gap(px(3.0))
-                            .child(
-                                div()
-                                    .text_size(px(11.0))
-                                    .text_color(Theme::with_alpha(theme.text_muted, 0.55))
-                                    .child("READING BUFFER · FLOW CHECK"),
-                            )
-                            .child(
-                                div()
-                                    .flex()
-                                    .flex_wrap()
-                                    .items_center()
-                                    .gap(px(4.0))
-                                    .text_size(px(12.0))
-                                    .text_color(theme.text_secondary)
-                                    .child("Line 18 contains uncommitted stream optimizations. All 14 test fixtures in")
-                                    .child(
-                                        div()
-                                            .text_color(theme.accent)
-                                            .child("tests/stream.rs"),
-                                    )
-                                    .child("pass with zero jitter."),
-                            ),
-                    )
-                    .into_any_element(),
-            );
-        }
-
         // Compute vertical scrollbar thumb metrics
         let thumb_ratio = (visible_cap as f32 / total_lines as f32).clamp(0.08, 1.0);
         let scroll_ratio = if total_lines > visible_cap {
@@ -2135,8 +2094,7 @@ impl Render for EditorView {
                         .py(px(6.0))
                         .child(
                             div()
-                                .max_w(px(840.0))
-                                .mx_auto()
+                                .w_full()
                                 .px(px(12.0))
                                 .py(px(6.0))
                                 .rounded(px(6.0))
@@ -2279,7 +2237,7 @@ impl Render for EditorView {
                         ),
                 )
             })
-            // Centered editorial code stream (1:1 Stitch max-w-[84ch])
+            // Editorial code stream — flush against the sidebar (no dead gutter gap)
             .child(
                 div()
                     .relative()
@@ -2288,12 +2246,10 @@ impl Render for EditorView {
                     .px(px(40.0))
                     .pt(px(8.0))
                     .flex()
-                    .justify_center()
                     .overflow_hidden()
                     .child(
                         div()
                             .w_full()
-                            .max_w(px(840.0))
                             .flex()
                             .flex_col()
                             .children(rows),

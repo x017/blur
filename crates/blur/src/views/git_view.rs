@@ -160,6 +160,24 @@ impl GitView {
         view
     }
 
+    /// Rebinds the view to a different workspace root (Open Folder / Workspace).
+    pub fn set_root(&mut self, root: &Path, cx: &mut Context<Self>) {
+        self.repo = GitRepo::discover(root).ok();
+        self.selected_file = None;
+        self.active_diff = None;
+        self.selected_commit_idx = 0;
+        self.modal = GitModal::None;
+        self.head = HeadInfo {
+            branch: None,
+            oid: None,
+            detached: false,
+            upstream: None,
+            ahead: 0,
+            behind: 0,
+        };
+        self.refresh(cx);
+    }
+
     pub fn refresh(&mut self, cx: &mut Context<Self>) {
         if let Some(repo) = &self.repo {
             let h = repo.head();

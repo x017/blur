@@ -98,6 +98,9 @@ fn standard_bindings(p: &str) -> Vec<KeyBindingSpec> {
     // Editor
     add(format!("{p}-s"), "editor.save");
     add(format!("{p}-k s"), "editor.save_all");
+    add(format!("{p}-="), "editor.increase_font_size");
+    add(format!("{p}--"), "editor.decrease_font_size");
+    add(format!("{p}-0"), "editor.reset_font_size");
     add(format!("{p}-w"), "editor.close_tab");
     add("ctrl-tab".to_string(), "editor.next_tab");
     add("ctrl-shift-tab".to_string(), "editor.prev_tab");

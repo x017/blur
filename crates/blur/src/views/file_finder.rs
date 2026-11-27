@@ -171,13 +171,35 @@ impl FileFinderView {
     }
 
     pub fn set_mode(&mut self, mode: FinderMode, window: &mut Window, cx: &mut Context<Self>) {
+        self.set_mode_no_focus(mode, cx);
+        self.query_input.read(cx).focus(window);
+        cx.notify();
+    }
+
+    /// Switches finder mode without taking keyboard focus (usable from commands).
+    pub fn set_mode_no_focus(&mut self, mode: FinderMode, cx: &mut Context<Self>) {
         self.mode = mode;
         self.selected_idx = 0;
         let q = self.query_input.read(cx).value().to_string();
         if q != "src/protocol rust" {
             self.run_query(&q, cx);
         }
-        self.query_input.read(cx).focus(window);
+        cx.notify();
+    }
+
+    /// Replaces the search roots (e.g. after Open Folder) and rescans the index.
+    pub fn set_roots(&mut self, roots: Vec<PathBuf>, cx: &mut Context<Self>) {
+        self.roots = roots;
+        self.file_index = FileIndex::scan(&self.roots);
+        self.search_results = None;
+        self.preview_path = None;
+        self.preview_lines.clear();
+        self.selected_idx = 0;
+        let q = self.query_input.read(cx).value().to_string();
+        if q != "src/protocol rust" {
+            self.using_showcase = false;
+            self.run_query(&q, cx);
+        }
         cx.notify();
     }
 

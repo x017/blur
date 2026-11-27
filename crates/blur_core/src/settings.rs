@@ -94,6 +94,15 @@ density = "comfortable"
 show_minimap = false
 # Start in distraction-free Zen Mode.
 zen_mode = false
+# Visible top-bar navigation tabs. Any of: "editor", "file_finder",
+# "version_control", "protocols_lsp", "utilities", "theme", "settings".
+nav_tabs = ["editor", "file_finder", "version_control", "protocols_lsp", "utilities", "theme", "settings"]
+# Header / editor chrome item visibility (customizable in Settings > Tabs & Page Navigation).
+top_bar_breadcrumb = true
+top_bar_search = true
+top_bar_stats = true
+top_bar_actions = true
+top_bar_quick_actions = true
 
 [terminal]
 # Override default shell executable (uses $SHELL when unset).
@@ -216,6 +225,22 @@ pub enum UiDensity {
     Comfortable,
 }
 
+/// Default set of top-bar navigation tabs (all visible).
+fn default_nav_tabs() -> Vec<String> {
+    [
+        "editor",
+        "file_finder",
+        "version_control",
+        "protocols_lsp",
+        "utilities",
+        "theme",
+        "settings",
+    ]
+    .iter()
+    .map(|s| s.to_string())
+    .collect()
+}
+
 /// User interface theme and layout settings.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 #[serde(default)]
@@ -227,6 +252,19 @@ pub struct UiSettings {
     pub density: UiDensity,
     pub show_minimap: bool,
     pub zen_mode: bool,
+    /// Visible top-bar navigation tabs (keys: `editor`, `file_finder`,
+    /// `version_control`, `protocols_lsp`, `utilities`, `theme`, `settings`).
+    pub nav_tabs: Vec<String>,
+    /// Show the active-file breadcrumb in the header bar.
+    pub top_bar_breadcrumb: bool,
+    /// Show the centered command-palette search trigger in the editor quiet bar.
+    pub top_bar_search: bool,
+    /// Show ambient stats (lines / tabs) in the editor quiet bar.
+    pub top_bar_stats: bool,
+    /// Show the preview / terminal quick-action buttons in the editor quiet bar.
+    pub top_bar_actions: bool,
+    /// Show the palette summoner + theme switcher buttons in the header bar.
+    pub top_bar_quick_actions: bool,
 }
 
 impl Default for UiSettings {
@@ -239,6 +277,12 @@ impl Default for UiSettings {
             density: UiDensity::Comfortable,
             show_minimap: false,
             zen_mode: false,
+            nav_tabs: default_nav_tabs(),
+            top_bar_breadcrumb: true,
+            top_bar_search: true,
+            top_bar_stats: true,
+            top_bar_actions: true,
+            top_bar_quick_actions: true,
         }
     }
 }
@@ -589,9 +633,21 @@ impl ConfigStore {
     /// Updates a single dotted key (e.g. `"editor.font_size"`) in the user config file,
     /// preserving all other keys, writes the file, and reloads the store.
     pub fn set_user_value(&mut self, dotted_key: &str, value: toml::Value) -> Result<()> {
-        let segments: Vec<&str> = dotted_key.split('.').filter(|s| !s.is_empty()).collect();
-        if segments.is_empty() {
-            return Err(anyhow!("configuration key cannot be empty"));
+        self.set_user_values(&[(dotted_key, value)])
+    }
+
+    /// Updates several dotted keys in the user config file in a single read/modify/write
+    /// cycle, then reloads the store once. Keys are applied in order, so later keys win
+    /// when they address the same leaf.
+    pub fn set_user_values(&mut self, values: &[(&str, toml::Value)]) -> Result<()> {
+        if values.is_empty() {
+            return Ok(());
+        }
+        for (key, _) in values {
+            let segments: Vec<&str> = key.split('.').filter(|s| !s.is_empty()).collect();
+            if segments.is_empty() {
+                return Err(anyhow!("configuration key cannot be empty"));
+            }
         }
 
         let mut root_table = if self.user_path.exists() {
@@ -612,21 +668,24 @@ impl ConfigStore {
             toml::Table::new()
         };
 
-        let mut current = &mut root_table;
-        for &segment in &segments[..segments.len() - 1] {
-            let entry = current
-                .entry(segment.to_string())
-                .or_insert_with(|| toml::Value::Table(toml::Table::new()));
-            if !entry.is_table() {
-                *entry = toml::Value::Table(toml::Table::new());
+        for (dotted_key, value) in values {
+            let segments: Vec<&str> = dotted_key.split('.').filter(|s| !s.is_empty()).collect();
+            let mut current = &mut root_table;
+            for &segment in &segments[..segments.len() - 1] {
+                let entry = current
+                    .entry(segment.to_string())
+                    .or_insert_with(|| toml::Value::Table(toml::Table::new()));
+                if !entry.is_table() {
+                    *entry = toml::Value::Table(toml::Table::new());
+                }
+                current = entry
+                    .as_table_mut()
+                    .ok_or_else(|| anyhow!("failed to descend into table '{segment}'"))?;
             }
-            current = entry
-                .as_table_mut()
-                .ok_or_else(|| anyhow!("failed to descend into table '{segment}'"))?;
-        }
 
-        let leaf = segments[segments.len() - 1];
-        current.insert(leaf.to_string(), value);
+            let leaf = segments[segments.len() - 1];
+            current.insert(leaf.to_string(), value.clone());
+        }
 
         if let Some(parent) = self.user_path.parent() {
             std::fs::create_dir_all(parent).with_context(|| {
