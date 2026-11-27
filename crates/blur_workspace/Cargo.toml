@@ -1,0 +1,20 @@
+[package]
+name = "blur_workspace"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+notify.workspace = true
+ignore.workspace = true
+regex.workspace = true
+nucleo-matcher.workspace = true
+walkdir.workspace = true
+dirs.workspace = true
+parking_lot.workspace = true

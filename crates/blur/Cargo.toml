@@ -1,0 +1,38 @@
+[package]
+name = "blur"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+description = "Blur — a native, lightweight development environment built with Rust and GPUI"
+
+[[bin]]
+name = "blur"
+path = "src/main.rs"
+
+[dependencies]
+gpui.workspace = true
+blur_core.workspace = true
+blur_buffer.workspace = true
+blur_syntax.workspace = true
+blur_lsp.workspace = true
+blur_dap.workspace = true
+blur_git.workspace = true
+blur_terminal.workspace = true
+blur_workspace.workspace = true
+blur_extensions.workspace = true
+blur_utils.workspace = true
+blur_viewers.workspace = true
+blur_theme.workspace = true
+blur_ui.workspace = true
+blur_editor.workspace = true
+tokio.workspace = true
+futures.workspace = true
+toml.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+parking_lot.workspace = true
+dirs.workspace = true

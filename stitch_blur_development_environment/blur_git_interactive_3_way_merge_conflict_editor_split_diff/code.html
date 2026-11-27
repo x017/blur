@@ -1,0 +1,422 @@
+<!DOCTYPE html><html class="h-full bg-[#111318] text-[#c9d1d9] antialiased" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Blur - Git Interactive 3-Way Merge Conflict Editor &amp; Split Diff</title>
+<!-- Tailwind CSS v3 CDN with forms & container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            canvas: '#111318',
+            surface: {
+              DEFAULT: '#1a1b21',
+              subtle: '#14161c',
+              elevated: '#20222a',
+              border: '#2a2d37',
+              borderLight: '#363a47',
+            },
+            accent: {
+              DEFAULT: '#6c99bb',
+              hover: '#7daac9',
+              muted: '#405769',
+            },
+            diff: {
+              redBg: 'rgba(235, 77, 75, 0.12)',
+              redBorder: 'rgba(235, 77, 75, 0.45)',
+              redText: '#f87171',
+              greenBg: 'rgba(46, 204, 113, 0.12)',
+              greenBorder: 'rgba(46, 204, 113, 0.45)',
+              greenText: '#4ade80',
+              baseBg: 'rgba(108, 153, 187, 0.08)',
+              baseBorder: 'rgba(108, 153, 187, 0.35)',
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace'],
+            sans: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+<!-- Custom Styles for Syntax and Scrollbars -->
+<style data-purpose="custom-scrollbars">
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #111318;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2d37;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3c404e;
+    }
+  </style>
+<style data-purpose="code-typography">
+    .code-line {
+      font-feature-settings: "liga" 0;
+      white-space: pre;
+    }
+    .token-keyword { color: #cc7832; }
+    .token-fn { color: #ffc66d; }
+    .token-type { color: #6897bb; }
+    .token-self { color: #94558d; }
+    .token-prop { color: #a9b7c6; }
+    .token-punct { color: #a9b7c6; }
+    .token-num { color: #6897bb; }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans select-none overflow-hidden bg-canvas text-gray-300">
+<!-- BEGIN: Top Application Navigation Bar -->
+<header class="h-10 border-b border-surface-border bg-[#0d0f13] flex items-center justify-between px-3.5 shrink-0 z-30" data-purpose="app-navigation">
+<!-- Window controls & breadcrumbs -->
+<div class="flex items-center space-x-3 text-xs">
+<div class="flex items-center space-x-1.5 pr-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80 hover:opacity-100 transition-opacity cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80 hover:opacity-100 transition-opacity cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80 hover:opacity-100 transition-opacity cursor-pointer"></span>
+</div>
+<span class="font-bold tracking-widest text-[#6c99bb] uppercase text-[11px] pr-1">BLUR</span>
+<span class="text-zinc-600">/</span>
+<span class="text-zinc-400">src</span>
+<span class="text-zinc-600">/</span>
+<span class="text-zinc-400">syntax</span>
+<span class="text-zinc-600">/</span>
+<span class="text-zinc-200 font-mono font-medium">parser.rs</span>
+</div>
+<!-- Center Navigation Tabs -->
+<nav class="flex items-center h-full space-x-1 text-xs">
+<button class="px-3 h-7 rounded text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated transition-colors">
+        Editor
+      </button>
+<button class="px-3 h-7 rounded bg-surface-elevated text-zinc-100 font-medium flex items-center space-x-1.5 shadow-sm border border-surface-border">
+<span class="w-1.5 h-1.5 rounded-full bg-[#6c99bb]"></span>
+<span>Version Control</span>
+</button>
+<button class="px-3 h-7 rounded text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated transition-colors">
+        Protocols &amp; LSP
+      </button>
+<button class="px-3 h-7 rounded text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated transition-colors">
+        Utilities
+      </button>
+<button class="px-3 h-7 rounded text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated transition-colors">
+        Settings
+      </button>
+</nav>
+<!-- Right Controls: Palette & Profile -->
+<div class="flex items-center space-x-2.5">
+<button class="flex items-center space-x-1 px-2.5 py-1 text-xs text-zinc-400 bg-surface rounded border border-surface-border hover:border-zinc-500 transition-colors">
+<span class="text-[10px] bg-surface-elevated px-1 py-0.5 rounded text-zinc-300 font-mono">⌘K</span>
+<span class="text-xs">Palette</span>
+</button>
+<div class="relative pl-1">
+<img alt="Sayuri Arisawa Avatar" class="w-6 h-6 rounded-full ring-1 ring-accent object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8tQrHvGobbaiKTrTv4JzJS5h57_0xGzqeL7FmXv4r4SGb6F25EaH9R_YZWNk8uEo0GYz0BdTbk7DWy2QkG4M2LFl1yMfgClEeqEv-LGTkW4BHM-gNaobIXIgrkjyj2-kvRTBBa5f8pdZC1xIu6O2kqIcGJ7sfEf2nN9HWULqLDO8NbgjtYZY1tVuREsIEJgOnSblgWEJHaEZOvz5El-rfssPY7WXPJVbp4txGRxA">
+<span class="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-canvas"></span>
+</div>
+</div>
+</header>
+<!-- END: Top Application Navigation Bar -->
+<!-- BEGIN: Merge Conflict Banner & Context Bar -->
+<section class="border-b border-surface-border bg-surface px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0" data-purpose="conflict-resolution-header">
+<div class="flex items-center space-x-3 min-w-0">
+<div class="flex items-center space-x-2 bg-red-950/40 text-red-300 border border-red-800/60 px-2.5 py-1 rounded text-xs font-mono font-medium">
+<svg class="w-3.5 h-3.5 text-red-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>MERGE CONFLICT IN PROGRESS · src/syntax/parser.rs</span>
+</div>
+<span class="text-xs bg-amber-950/40 text-amber-300 border border-amber-800/40 px-2 py-0.5 rounded-full font-medium">
+        1 of 3 conflicts unresolved
+      </span>
+<div class="hidden md:flex items-center text-xs text-zinc-400 space-x-1.5 font-mono">
+<span class="text-zinc-500">Merging</span>
+<span class="text-emerald-400 bg-emerald-950/30 px-1.5 py-0.5 rounded border border-emerald-900/40">origin/feature/ast-walker (incoming)</span>
+<span class="text-zinc-500">into</span>
+<span class="text-red-400 bg-red-950/30 px-1.5 py-0.5 rounded border border-red-900/40">HEAD: main (current)</span>
+</div>
+</div>
+<!-- Global Resolution Action Buttons -->
+<div class="flex items-center space-x-2 text-xs">
+<button class="px-2.5 py-1 rounded bg-surface-elevated hover:bg-surface-border text-zinc-300 border border-surface-border transition-colors">
+        Accept All Current
+      </button>
+<button class="px-2.5 py-1 rounded bg-surface-elevated hover:bg-surface-border text-zinc-300 border border-surface-border transition-colors">
+        Accept All Incoming
+      </button>
+<button class="px-2.5 py-1 rounded bg-red-950/20 hover:bg-red-900/40 text-red-300 border border-red-900/50 transition-colors">
+        Abort Merge (git merge --abort)
+      </button>
+<button class="px-3 py-1 bg-[#6c99bb] hover:bg-[#7daac9] text-canvas font-semibold rounded flex items-center space-x-1.5 shadow-sm transition-colors">
+<svg class="w-3.5 h-3.5 text-canvas" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Mark Resolved &amp; Stage (⌘↵)</span>
+</button>
+</div>
+</section>
+<!-- END: Merge Conflict Banner & Context Bar -->
+<!-- BEGIN: Main Work Area (Split 3-Way Diff + Bottom Output Buffer) -->
+<main class="flex-1 flex flex-col min-h-0 overflow-hidden" data-purpose="merge-split-workspace">
+<!-- Top Half: 3-Way Split Diff View -->
+<div class="flex-1 grid grid-cols-3 divide-x divide-surface-border min-h-0 bg-canvas"><!-- Column 1: CURRENT CHANGE (HEAD / Ours) -->
+<section class="flex flex-col min-h-0 bg-[#0e1015] border-r border-[#2a2d37]" data-purpose="pane-current-change">
+  <div class="h-9 bg-[#14161c] border-b border-[#2a2d37] px-3.5 flex items-center justify-between text-xs shrink-0 select-none">
+    <div class="flex items-center space-x-2 truncate">
+      <span class="w-2 h-2 rounded-full bg-red-400 shrink-0"></span>
+      <span class="font-semibold text-red-300 tracking-wide text-[11.5px]">CURRENT CHANGE</span>
+      <span class="text-zinc-500 font-mono text-[11px]">(HEAD · main)</span>
+    </div>
+    <div class="flex items-center space-x-2 shrink-0">
+      <span class="text-[11px] text-zinc-400 font-mono">Sayuri A.</span>
+      <button class="text-[11px] px-2.5 py-0.5 bg-red-950/40 hover:bg-red-900/60 text-red-200 border border-red-800/60 rounded font-medium transition-colors shadow-sm">
+        Accept Current (Ours)
+      </button>
+    </div>
+  </div>
+  <div class="flex-1 overflow-auto font-mono text-xs leading-6 p-2.5 bg-[#0c0e13]">
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">142</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let mut</span> current_lookahead = <span class="token-self">self</span>.peek_cache.take();</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">143</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">if let</span> <span class="token-type">Some</span>(token) = current_lookahead {</span>
+    </div>
+    <div class="bg-red-950/20 border-y border-red-900/40 my-0.5">
+      <div class="flex items-center h-6 bg-red-950/30 text-red-200">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-red-400/80 font-semibold text-[11px]">144</span>
+        <span class="w-4 select-none text-red-400 font-bold pl-0.5">-</span>
+        <span class="code-line"><span class="token-self">self</span>.metrics.cached_hits += <span class="token-num">1</span>;</span>
+      </div>
+      <div class="flex items-center h-6 bg-red-950/30 text-red-200">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-red-400/80 font-semibold text-[11px]">145</span>
+        <span class="w-4 select-none text-red-400 font-bold pl-0.5">-</span>
+        <span class="code-line"><span class="token-keyword">return</span> <span class="token-type">Ok</span>(token);</span>
+      </div>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">146</span>
+      <span class="code-line text-zinc-300">}</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">147</span>
+      <span class="code-line"></span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">148</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let</span> next_byte = <span class="token-self">self</span>.reader.next_u8().map_err(|e| {</span>
+    </div>
+  </div>
+</section>
+<!-- Column 2: BASE (Common Ancestor) -->
+<section class="flex flex-col min-h-0 bg-[#0d0f14] border-r border-[#2a2d37]" data-purpose="pane-base-ancestor">
+  <div class="h-9 bg-[#14161c] border-b border-[#2a2d37] px-3.5 flex items-center justify-between text-xs shrink-0 select-none">
+    <div class="flex items-center space-x-2 truncate">
+      <span class="w-2 h-2 rounded-full bg-[#6c99bb] shrink-0"></span>
+      <span class="font-semibold text-zinc-300 tracking-wide text-[11.5px]">BASE</span>
+      <span class="text-zinc-500 font-mono text-[11px]">(Ancestor · f17c49b)</span>
+    </div>
+    <span class="text-[10px] uppercase font-mono tracking-wider bg-[#20222a] text-zinc-400 px-2 py-0.5 rounded border border-[#2a2d37] shrink-0">
+      Common Ancestor
+    </span>
+  </div>
+  <div class="flex-1 overflow-auto font-mono text-xs leading-6 p-2.5 bg-[#0a0c10]">
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">142</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let mut</span> current_lookahead = <span class="token-self">self</span>.peek_cache.take();</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">143</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">if let</span> <span class="token-type">Some</span>(token) = current_lookahead {</span>
+    </div>
+    <div class="bg-[#6c99bb]/10 border-y border-[#6c99bb]/30 my-0.5 text-zinc-300">
+      <div class="flex items-center h-6">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-500 text-[11px]">144</span>
+        <span class="w-4 select-none text-zinc-600 pl-0.5">&nbsp;</span>
+        <span class="code-line"><span class="token-self">self</span>.cache.record_hit();</span>
+      </div>
+      <div class="flex items-center h-6">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-500 text-[11px]">145</span>
+        <span class="w-4 select-none text-zinc-600 pl-0.5">&nbsp;</span>
+        <span class="code-line"><span class="token-keyword">return</span> <span class="token-type">Ok</span>(token);</span>
+      </div>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">146</span>
+      <span class="code-line text-zinc-300">}</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">147</span>
+      <span class="code-line"></span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">148</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let</span> next_byte = <span class="token-self">self</span>.reader.next_u8().map_err(|e| {</span>
+    </div>
+  </div>
+</section>
+<!-- Column 3: INCOMING CHANGE (Theirs) -->
+<section class="flex flex-col min-h-0 bg-[#0e1015]" data-purpose="pane-incoming-change">
+  <div class="h-9 bg-[#14161c] border-b border-[#2a2d37] px-3.5 flex items-center justify-between text-xs shrink-0 select-none">
+    <div class="flex items-center space-x-2 truncate mr-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+      <span class="font-semibold text-emerald-300 tracking-wide text-[11.5px]">INCOMING CHANGE</span>
+      <span class="text-zinc-500 font-mono text-[11px] truncate">(feature/ast-walker)</span>
+    </div>
+    <div class="flex items-center space-x-2 shrink-0">
+      <span class="text-[11px] text-zinc-400 font-mono">Tatsuo M.</span>
+      <button class="text-[11px] px-2.5 py-0.5 bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-200 border border-emerald-800/60 rounded font-medium transition-colors shadow-sm whitespace-nowrap">
+        Accept Incoming (Theirs)
+      </button>
+    </div>
+  </div>
+  <div class="flex-1 overflow-auto font-mono text-xs leading-6 p-2.5 bg-[#0c0e13]">
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">142</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let mut</span> current_lookahead = <span class="token-self">self</span>.peek_cache.take();</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">143</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">if let</span> <span class="token-type">Some</span>(token) = current_lookahead {</span>
+    </div>
+    <div class="bg-emerald-950/20 border-y border-emerald-900/40 my-0.5">
+      <div class="flex items-center h-6 bg-emerald-950/30 text-emerald-200">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-400/80 font-semibold text-[11px]">144</span>
+        <span class="w-4 select-none text-emerald-400 font-bold pl-0.5">+</span>
+        <span class="code-line"><span class="token-self">self</span>.metrics.cached_hits.fetch_add(<span class="token-num">1</span>, Ordering::Relaxed);</span>
+      </div>
+      <div class="flex items-center h-6 bg-emerald-950/30 text-emerald-200">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-400/80 font-semibold text-[11px]">145</span>
+        <span class="w-4 select-none text-emerald-400 font-bold pl-0.5">+</span>
+        <span class="code-line"><span class="token-self">self</span>.state_counter.advance();</span>
+      </div>
+      <div class="flex items-center h-6 bg-emerald-950/30 text-emerald-200">
+        <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-400/80 font-semibold text-[11px]">146</span>
+        <span class="w-4 select-none text-emerald-400 font-bold pl-0.5">+</span>
+        <span class="code-line"><span class="token-keyword">return</span> <span class="token-type">Ok</span>(token);</span>
+      </div>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">147</span>
+      <span class="code-line text-zinc-300">}</span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">148</span>
+      <span class="code-line"></span>
+    </div>
+    <div class="text-zinc-500 flex items-center h-6">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">149</span>
+      <span class="code-line text-zinc-300"><span class="token-keyword">let</span> next_byte = <span class="token-self">self</span>.reader.next_u8().map_err(|e| {</span>
+    </div>
+  </div>
+</section></div>
+<!-- Bottom Half: Result Buffer / Interactive Staging Preview -->
+<section class="h-64 border-t-2 border-surface-border bg-surface-subtle flex flex-col shrink-0" data-purpose="result-buffer"><!-- Result Buffer Header -->
+<div class="h-8 bg-[#14161c] border-b border-[#2a2d37] px-4 flex items-center justify-between text-xs select-none">
+  <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-2 font-medium text-zinc-200">
+      <svg class="w-4 h-4 text-[#6c99bb] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+      </svg>
+      <span class="text-[11.5px] font-semibold tracking-wider uppercase text-zinc-200">RESULT BUFFER (Interactive Output / Staging Preview)</span>
+    </div>
+    <span class="text-zinc-500 text-[11px] font-mono bg-[#1a1b21] px-2 py-0.5 rounded border border-[#2a2d37]">Lines 142–150</span>
+  </div>
+  <!-- Inline resolution quick actions -->
+  <div class="flex items-center space-x-2">
+    <span class="text-[11px] text-zinc-400 mr-1">Resolve this conflict:</span>
+    <button class="px-2.5 py-0.5 rounded bg-[#20222a] hover:bg-[#2a2d37] text-red-300 border border-[#2a2d37] text-[11px] font-medium transition-colors shadow-sm">
+      Accept Current
+    </button>
+    <button class="px-2.5 py-0.5 rounded bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-800/60 text-[11px] font-medium ring-1 ring-emerald-500/30 transition-colors shadow-sm flex items-center space-x-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1"></span>
+      <span>Accept Incoming (Selected)</span>
+    </button>
+    <button class="px-2.5 py-0.5 rounded bg-[#20222a] hover:bg-[#2a2d37] text-zinc-300 border border-[#2a2d37] text-[11px] font-medium transition-colors shadow-sm">
+      Accept Both
+    </button>
+  </div>
+</div>
+<!-- Result Code Body -->
+<div class="flex-1 overflow-auto font-mono text-xs leading-6 p-3 bg-[#0a0c10]">
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">142</span>
+    <span class="code-line text-zinc-300"><span class="token-keyword">let mut</span> current_lookahead = <span class="token-self">self</span>.peek_cache.take();</span>
+  </div>
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">143</span>
+    <span class="code-line text-zinc-300"><span class="token-keyword">if let</span> <span class="token-type">Some</span>(token) = current_lookahead {</span>
+  </div>
+  <!-- Resolved Code Insertion with subtle highlight -->
+  <div class="bg-emerald-950/20 border-l-2 border-emerald-500 pl-1 my-0.5">
+    <div class="flex items-center h-6 text-emerald-200">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-500/80 font-semibold text-[11px]">144</span>
+      <span class="code-line"><span class="token-self">self</span>.metrics.cached_hits.fetch_add(<span class="token-num">1</span>, Ordering::Relaxed);</span>
+    </div>
+    <div class="flex items-center h-6 text-emerald-200">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-500/80 font-semibold text-[11px]">145</span>
+      <span class="code-line"><span class="token-self">self</span>.state_counter.advance();</span>
+    </div>
+    <div class="flex items-center h-6 text-emerald-200">
+      <span class="w-9 shrink-0 text-right pr-3 select-none text-emerald-500/80 font-semibold text-[11px]">146</span>
+      <span class="code-line"><span class="token-keyword">return</span> <span class="token-type">Ok</span>(token);</span>
+    </div>
+  </div>
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">147</span>
+    <span class="code-line text-zinc-300">}</span>
+  </div>
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">148</span>
+    <span class="code-line"></span>
+  </div>
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">149</span>
+    <span class="code-line text-zinc-300"><span class="token-keyword">let</span> next_byte = <span class="token-self">self</span>.reader.next_u8().map_err(|e| {</span>
+  </div>
+  <div class="flex items-center h-6 text-zinc-500">
+    <span class="w-10 shrink-0 text-right pr-3 select-none text-zinc-700 text-[11px]">150</span>
+    <span class="code-line text-zinc-300">    <span class="token-self">self</span>.diagnostics.record_fault(<span class="token-self">self</span>.cursor_position);</span>
+  </div>
+</div></section>
+</main>
+<!-- END: Main Work Area -->
+<!-- BEGIN: Bottom Status Bar -->
+<footer class="h-7 border-t border-surface-border bg-[#0d0f13] px-3 flex items-center justify-between text-[11px] font-mono text-zinc-400 shrink-0 select-none" data-purpose="app-status-bar"><!-- Left: Git status & shortcuts -->
+<div class="flex items-center space-x-3.5 overflow-hidden">
+  <div class="flex items-center space-x-1.5 text-amber-400 shrink-0">
+    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+    <span class="font-medium">CONFLICT (content): Merge conflict in src/syntax/parser.rs</span>
+  </div>
+  <span class="text-zinc-600">|</span>
+  <!-- Keybinding helpers -->
+  <div class="hidden md:flex items-center space-x-2.5 text-zinc-400 text-[10.5px]">
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">o</kbd> <span>ours</span></span>
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">t</kbd> <span>theirs</span></span>
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">b</kbd> <span>both</span></span>
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">n</kbd> <span>next</span></span>
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">p</kbd> <span>prev</span></span>
+    <span class="flex items-center space-x-1"><kbd class="bg-[#20222a] text-zinc-200 px-1 py-0.2 rounded border border-[#2a2d37] shadow-xs font-semibold">⌘↵</kbd> <span>stage &amp; continue</span></span>
+  </div>
+</div>
+<!-- Right: Tooling metadata -->
+<div class="flex items-center space-x-3 text-zinc-500 shrink-0 text-[10.5px]">
+  <span class="text-zinc-400">Rustc 1.78</span>
+  <span>UTF-8</span>
+  <span>spaces: 4</span>
+  <span class="flex items-center space-x-1 text-emerald-400 font-medium">
+    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    <span>clean</span>
+  </span>
+</div></footer>
+<!-- END: Bottom Status Bar -->
+
+
+</body></html>

@@ -1,0 +1,16 @@
+[package]
+name = "blur_editor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+gpui.workspace = true
+blur_theme.workspace = true
+blur_buffer.workspace = true
+blur_syntax.workspace = true
+blur_core.workspace = true
+blur_lsp.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

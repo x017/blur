@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; } 
+      body { overscroll-behavior: none; } 
+      main > :first-child { margin-top: 0 !important; } 
+      main > :last-child { margin-bottom: 0 !important; } 
+    } 
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #33353a; border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#282a2f",
+            "primary-container": "#6c99bb",
+            "on-tertiary": "#412d00",
+            "surface-container": "#1e2025",
+            "on-surface": "#e2e2e9",
+            "outline-variant": "#41474d",
+            "inverse-on-surface": "#2e3036",
+            "secondary-container": "#1d4f46",
+            "on-secondary-fixed": "#00201b",
+            "surface-variant": "#33353a",
+            "on-primary-container": "#003049",
+            "on-primary": "#00344e",
+            "primary": "#9eccf0",
+            "on-secondary-fixed-variant": "#1d4f46",
+            "on-background": "#e2e2e9",
+            "tertiary-container": "#b28f4a",
+            "tertiary": "#e9c176",
+            "surface-tint": "#9eccf0",
+            "on-primary-fixed-variant": "#184b69",
+            "on-primary-fixed": "#001e2f",
+            "on-secondary-container": "#8dbfb4",
+            "on-error": "#690005",
+            "primary-fixed": "#c9e6ff",
+            "error-container": "#93000a",
+            "outline": "#8b9198",
+            "surface-dim": "#111318",
+            "on-surface-variant": "#c1c7ce",
+            "background": "#111318",
+            "on-tertiary-fixed": "#261900",
+            "on-tertiary-container": "#3c2a00",
+            "surface-bright": "#37393f",
+            "secondary-fixed-dim": "#9ed0c5",
+            "on-secondary": "#003730",
+            "error": "#ffb4ab",
+            "secondary-fixed": "#baede1",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#e9c176",
+            "inverse-primary": "#346382",
+            "inverse-surface": "#e2e2e9",
+            "primary-fixed-dim": "#9eccf0",
+            "secondary": "#9ed0c5",
+            "surface-container-highest": "#33353a",
+            "tertiary-fixed": "#ffdea5",
+            "surface": "#111318",
+            "surface-container-low": "#1a1b21",
+            "on-tertiary-fixed-variant": "#5d4201",
+            "surface-container-lowest": "#0c0e13"
+          },
+          fontFamily: {
+            "body-lg": ["JetBrains Mono"],
+            "body-md": ["JetBrains Mono"],
+            "label-sm": ["Geist"],
+            "code-inline": ["JetBrains Mono"],
+            "label-md": ["Geist"],
+            "headline-md": ["Geist"],
+            "headline-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "body-sm": ["JetBrains Mono"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-highest selection:text-primary">
+<!-- Top Blur Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant/30">
+<div class="h-11 w-full px-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+</div>
+<div class="flex items-center gap-1.5 pl-1">
+<span class="font-label-sm text-[11px] font-bold tracking-widest uppercase text-outline">BLUR</span>
+<span class="px-1 text-outline/30">/</span>
+<div class="hidden sm:flex items-center text-outline text-[12px] font-code-inline">
+<span class="hover:text-on-surface-variant transition-colors cursor-pointer">src</span>
+<span class="px-1 text-outline/30">/</span>
+<span class="text-on-surface font-medium">main.rs</span>
+</div>
+</div>
+</div>
+<nav class="flex items-center gap-1 bg-surface-container-low p-1 rounded border border-outline-variant/20" data-active-classes="bg-surface-container-high text-on-surface rounded font-label-md">
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="editor" href="#">Editor</a>
+<a aria-current="page" class="font-label-md text-[12px] px-2.5 py-1 bg-surface-container-high text-on-surface rounded font-medium shadow-sm flex items-center gap-1.5" data-path="git" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span>Version Control</span>
+</a>
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="lsp" href="#">Protocols &amp; LSP</a>
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="utilities" href="#">Utilities</a>
+</nav>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 bg-surface-container-low px-2 py-0.5 rounded border border-outline-variant/30 text-outline hover:text-on-surface-variant transition-colors cursor-pointer shadow-sm">
+<span class="font-code-inline text-[11px]">⌘K</span>
+<span class="text-[11px] font-label-sm text-outline/70">Palette</span>
+</div>
+<div class="relative flex items-center">
+<img alt="Active User Avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/>
+<span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-secondary border border-surface-container-lowest"></span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Lazygit Terminal Layout -->
+<main class="w-full pt-11 pb-8 flex-1 bg-[#101216] overflow-hidden flex flex-col">
+<!-- Top Lazygit Info / Repo Status Strip -->
+<div class="px-3 py-1.5 bg-surface-container-lowest border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline select-none">
+<div class="flex items-center gap-3">
+<span class="text-secondary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">terminal</span>
+          lazygit v0.41.0
+        </span>
+<span class="text-outline-variant">│</span>
+<span class="text-outline">repo: <span class="text-on-surface">blur-editor-core</span></span>
+<span class="text-outline-variant">│</span>
+<span class="text-outline">branch: <span class="text-primary font-medium">feature/ast-walker</span></span>
+<span class="px-1.5 py-0.2 rounded bg-primary/10 text-primary border border-primary/20">↑1 ↓0</span>
+<span class="text-outline-variant">│</span>
+<span class="text-outline">remote: <span class="text-on-surface-variant">origin/feature/ast-walker</span></span>
+</div>
+<div class="flex items-center gap-2 text-[10.5px] text-outline">
+<span class="flex items-center gap-1"><kbd class="bg-surface-container px-1 rounded text-on-surface border border-outline-variant/30">P</kbd> push</span>
+<span>·</span>
+<span class="flex items-center gap-1"><kbd class="bg-surface-container px-1 rounded text-on-surface border border-outline-variant/30">p</kbd> pull</span>
+<span>·</span>
+<span class="flex items-center gap-1"><kbd class="bg-surface-container px-1 rounded text-on-surface border border-outline-variant/30">s</kbd> stash</span>
+<span>·</span>
+<span class="flex items-center gap-1 text-secondary"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> clean tree</span>
+</div>
+</div>
+<!-- Lazygit Multi-panel Split Grid -->
+<div class="flex-1 grid grid-cols-12 gap-1.5 p-1.5 min-h-0 bg-[#0d0f13]">
+<!-- LEFT SIDE: 4 Stacked Lazygit Panels (1..4) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-1.5 min-h-0">
+<!-- [1] STATUS PANEL -->
+<div class="h-28 bg-surface-container-lowest rounded border border-outline-variant/40 flex flex-col overflow-hidden relative shadow-sm">
+<div class="px-2 py-1 bg-surface-container-low/80 border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline">
+<div class="flex items-center gap-1.5">
+<span class="text-primary font-bold">[1] Status</span>
+<span class="text-outline/40">─</span>
+<span class="text-outline text-[10px]">repo state</span>
+</div>
+<span class="text-[10px] text-secondary bg-secondary/10 px-1 rounded">HEALTHY</span>
+</div>
+<div class="p-2 text-[11px] font-code-inline flex flex-col justify-between flex-1 text-outline">
+<div class="space-y-0.5">
+<div class="flex items-center justify-between">
+<span>Working tree:</span>
+<span class="text-tertiary">3 files modified</span>
+</div>
+<div class="flex items-center justify-between">
+<span>Tracking:</span>
+<span class="text-primary">origin/feature/ast-walker [ahead 1]</span>
+</div>
+<div class="flex items-center justify-between">
+<span>Sign status:</span>
+<span class="text-secondary flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">verified</span> GPG valid [F4C20B]</span>
+</div>
+</div>
+<div class="pt-1 border-t border-outline-variant/20 flex items-center justify-between text-[10px] text-outline/70">
+<span>Press <kbd class="text-on-surface bg-surface-container px-1 rounded">s</kbd> to inspect stashes</span>
+<span class="text-primary font-code-inline">ast-walker:clean</span>
+</div>
+</div>
+</div>
+<!-- [2] FILES / WORKING TREE PANEL -->
+<div class="h-44 bg-surface-container-lowest rounded border border-outline-variant/40 flex flex-col overflow-hidden relative shadow-sm">
+<div class="px-2 py-1 bg-surface-container-low/80 border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline">
+<div class="flex items-center gap-1.5">
+<span class="text-primary font-bold">[2] Files</span>
+<span class="text-outline/40">─</span>
+<span class="text-on-surface font-medium">3 changes</span>
+</div>
+<div class="flex items-center gap-1.5 text-[10px] text-outline">
+<span><kbd class="text-on-surface bg-surface-container px-1 rounded">space</kbd> toggle</span>
+<span><kbd class="text-on-surface bg-surface-container px-1 rounded">a</kbd> stage-all</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-1.5 text-[11.5px] font-code-inline space-y-1">
+<!-- Staged section header -->
+<div class="text-[10px] uppercase font-bold tracking-wider text-secondary flex items-center justify-between px-1 pt-0.5">
+<span>● Staged (2)</span>
+<span class="text-outline/60 lowercase cursor-pointer hover:text-on-surface">unstage: [space]</span>
+</div>
+<div class="flex items-center justify-between px-2 py-1 rounded bg-surface-container-low/60 hover:bg-surface-container text-on-surface cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold text-secondary bg-secondary/15 px-1 py-0.2 rounded">A</span>
+<span class="truncate text-on-surface-variant group-hover:text-on-surface">src/syntax/cursor.rs</span>
+</div>
+<span class="text-[10px] text-secondary font-code-inline">+42</span>
+</div>
+<div class="flex items-center justify-between px-2 py-1 rounded bg-surface-container-low/60 hover:bg-surface-container text-on-surface cursor-pointer group transition-colors">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold text-error bg-error/15 px-1 py-0.2 rounded">D</span>
+<span class="truncate text-on-surface-variant group-hover:text-on-surface">tests/legacy_lexer.rs</span>
+</div>
+<span class="text-[10px] text-error font-code-inline">-88</span>
+</div>
+<!-- Unstaged section header -->
+<div class="text-[10px] uppercase font-bold tracking-wider text-tertiary flex items-center justify-between px-1 pt-1 border-t border-outline-variant/20">
+<span>○ Unstaged (1)</span>
+<span class="text-outline/60 lowercase">active file</span>
+</div>
+<div class="flex items-center justify-between px-2 py-1 rounded bg-primary/10 border border-primary/40 text-on-surface cursor-pointer shadow-sm">
+<div class="flex items-center gap-2 truncate">
+<span class="text-[10px] font-bold text-tertiary bg-tertiary/20 px-1 py-0.2 rounded">M</span>
+<span class="truncate font-semibold text-primary">src/syntax/parser.rs</span>
+</div>
+<span class="text-[10px] text-tertiary font-code-inline">1 hunk</span>
+</div>
+</div>
+</div>
+<!-- [3] BRANCHES / REMOTES PANEL -->
+<div class="h-32 bg-surface-container-lowest rounded border border-outline-variant/40 flex flex-col overflow-hidden relative shadow-sm">
+<div class="px-2 py-1 bg-surface-container-low/80 border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline">
+<div class="flex items-center gap-1.5">
+<span class="text-primary font-bold">[3] Branches</span>
+<span class="text-outline/40">─</span>
+<span class="text-outline text-[10px]">local/remotes</span>
+</div>
+<div class="flex items-center gap-1 text-[10px] text-outline">
+<span class="px-1 rounded bg-surface-container-high text-on-surface">Local</span>
+<span class="hover:text-on-surface cursor-pointer">Remotes</span>
+<span class="hover:text-on-surface cursor-pointer">Tags</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-1.5 text-[11px] font-code-inline space-y-1">
+<div class="flex items-center justify-between px-2 py-0.5 rounded bg-surface-container border-l-2 border-primary text-primary font-medium cursor-pointer">
+<div class="flex items-center gap-1.5 truncate">
+<span class="material-symbols-outlined text-[13px]">check</span>
+<span class="truncate">* feature/ast-walker</span>
+</div>
+<span class="text-[10px] text-outline font-normal">origin/feature/ast-walker</span>
+</div>
+<div class="flex items-center justify-between px-2 py-0.5 rounded hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface cursor-pointer">
+<div class="flex items-center gap-1.5 truncate">
+<span class="w-3 text-center text-outline/50"> </span>
+<span class="truncate">main</span>
+</div>
+<span class="text-[10px] text-outline/60">[up to date]</span>
+</div>
+<div class="flex items-center justify-between px-2 py-0.5 rounded hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface cursor-pointer">
+<div class="flex items-center gap-1.5 truncate">
+<span class="w-3 text-center text-outline/50"> </span>
+<span class="truncate">refactor/tokenizer-v2</span>
+</div>
+<span class="text-[10px] text-outline/60">[gone]</span>
+</div>
+</div>
+</div>
+<!-- [4] COMMITS PANEL WITH CONTRIBUTOR PFPS -->
+<div class="flex-1 min-h-[220px] bg-surface-container-lowest rounded border border-outline-variant/40 flex flex-col overflow-hidden relative shadow-sm">
+<div class="px-2 py-1 bg-surface-container-low/80 border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline">
+<div class="flex items-center gap-1.5">
+<span class="text-primary font-bold">[4] Commits</span>
+<span class="text-outline/40">─</span>
+<span class="text-outline text-[10px]">log (HEAD)</span>
+</div>
+<span class="text-[10px] text-outline font-code-inline bg-surface-container px-1.5 py-0.2 rounded">28 total</span>
+</div>
+<div class="flex-1 overflow-y-auto p-1 text-[11px] font-code-inline divide-y divide-outline-variant/15">
+<!-- Commit 1: Sayuri Arisawa (Active Selected) -->
+<div class="p-1.5 rounded bg-surface-container/90 border border-primary/40 cursor-pointer shadow-sm relative pl-3">
+<div class="absolute left-1 top-2.5 bottom-2.5 w-1 rounded-full bg-primary"></div>
+<div class="flex items-center justify-between gap-1 mb-1">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="text-primary font-bold">●</span>
+<span class="font-semibold text-on-surface truncate text-[11.5px]">refactor: optimize token lookahead</span>
+</div>
+<span class="text-[10px] font-code-inline text-primary bg-primary/10 px-1 rounded shrink-0">c49f82d</span>
+</div>
+<div class="flex items-center justify-between text-[10.5px] text-outline">
+<div class="flex items-center gap-1.5">
+<img alt="Sayuri Arisawa" class="w-4 h-4 rounded-full object-cover ring-1 ring-outline/30 shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/>
+<span class="text-on-surface-variant font-medium">Sayuri Arisawa</span>
+<span class="text-outline/40">·</span>
+<span class="text-outline">14m ago</span>
+</div>
+<div class="flex items-center gap-1 text-[10px]">
+<span class="text-secondary font-bold">+18</span>
+<span class="text-error font-bold">-5</span>
+</div>
+</div>
+</div>
+<!-- Commit 2: Tatsuo Mitsuno -->
+<div class="p-1.5 rounded hover:bg-surface-container-low/60 cursor-pointer transition-colors relative pl-3">
+<div class="flex items-center justify-between gap-1 mb-1">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="text-outline-variant">○</span>
+<span class="text-on-surface-variant hover:text-on-surface truncate text-[11.5px]">fix(lsp): guard semantic tokens</span>
+</div>
+<span class="text-[10px] font-code-inline text-outline shrink-0">8e3a201</span>
+</div>
+<div class="flex items-center justify-between text-[10.5px] text-outline">
+<div class="flex items-center gap-1.5">
+<img alt="Tatsuo Mitsuno" class="w-4 h-4 rounded-full object-cover ring-1 ring-outline/30 shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIg9sLI0SBXHmgsBWAWkFcCy7oFD0VMxBCaks10hxP7tBTZNRpiwQ0oB7gMauC9ON3HcmWiS4JxyIJr8MKpq3z0LYBBpKMoi7ukFArKSwggexST0nvSonAOmY1s_pVHNq8pGSyj4k-sQHOqjQYlvSvjo1aEJg9YzKp_ENZPayB8uC0SjyGxKq2P0krGVRn2w1XIG6149G6C6U5UMLC58Z63TZvDoG24xPEUpBcbzs"/>
+<span class="text-outline hover:text-on-surface-variant">Tatsuo Mitsuno</span>
+<span class="text-outline/40">·</span>
+<span>2h ago</span>
+</div>
+<div class="flex items-center gap-1 text-[10px]">
+<span class="text-secondary">+4</span>
+<span class="text-error">-1</span>
+</div>
+</div>
+</div>
+<!-- Commit 3: Sayuri Arisawa -->
+<div class="p-1.5 rounded hover:bg-surface-container-low/60 cursor-pointer transition-colors relative pl-3">
+<div class="flex items-center justify-between gap-1 mb-1">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="text-outline-variant">○</span>
+<span class="text-on-surface-variant hover:text-on-surface truncate text-[11.5px]">perf: cache line offset indices</span>
+</div>
+<span class="text-[10px] font-code-inline text-outline shrink-0">f17c49b</span>
+</div>
+<div class="flex items-center justify-between text-[10.5px] text-outline">
+<div class="flex items-center gap-1.5">
+<img alt="Sayuri Arisawa" class="w-4 h-4 rounded-full object-cover ring-1 ring-outline/30 shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/>
+<span class="text-outline hover:text-on-surface-variant">Sayuri Arisawa</span>
+<span class="text-outline/40">·</span>
+<span>1d ago</span>
+</div>
+<div class="flex items-center gap-1 text-[10px]">
+<span class="text-secondary">+44</span>
+<span class="text-error">-12</span>
+</div>
+</div>
+</div>
+<!-- Commit 4: Malcolm Reid -->
+<div class="p-1.5 rounded hover:bg-surface-container-low/60 cursor-pointer transition-colors relative pl-3">
+<div class="flex items-center justify-between gap-1 mb-1">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="text-outline-variant">○</span>
+<span class="text-on-surface-variant hover:text-on-surface truncate text-[11.5px]">chore: bump tree-sitter bindings</span>
+</div>
+<span class="text-[10px] font-code-inline text-outline shrink-0">1a0bb3c</span>
+</div>
+<div class="flex items-center justify-between text-[10.5px] text-outline">
+<div class="flex items-center gap-1.5">
+<img alt="Malcolm Reid" class="w-4 h-4 rounded-full object-cover ring-1 ring-outline/30 shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3FWnRATDP9oXH25GOOP_vyhZ9kavgZsVksEluBtogd4kTxpc4cSm6FdQX4Azd3Dlk8Gc5Z1-CbmLY93RysMW3OYoP1Cx-hHAxHqbW3jPjd4UtROi2dfVZT88Ne_3c3RX7Ru6Umk8LZ6Kgld_pzf4j9SgXX-vXO4nc5IWg0eP7TaSp3ZSR9jMTk9txLqhnep6fQ_2EM_UtMRQmBvL89JMSB6Ril06tE6_He2sbK_E"/>
+<span class="text-outline hover:text-on-surface-variant">Malcolm Reid</span>
+<span class="text-outline/40">·</span>
+<span>3d ago</span>
+</div>
+<div class="flex items-center gap-1 text-[10px]">
+<span class="text-secondary">+9</span>
+<span class="text-error">-9</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT SIDE: [5] MAIN VIEW / DIFF & COMMIT INSPECTOR -->
+<div class="col-span-12 lg:col-span-8 flex flex-col bg-surface-container-lowest rounded border-2 border-primary/60 shadow-[0_0_15px_rgba(110,160,200,0.08)] overflow-hidden">
+<!-- Lazygit Main View Active Header -->
+<div class="px-3 py-1.5 bg-surface-container-low border-b border-outline-variant/30 flex items-center justify-between text-[12px] font-code-inline">
+<div class="flex items-center gap-2">
+<span class="text-primary font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+              [5] Main View: Diff
+            </span>
+<span class="text-outline/40">─</span>
+<span class="text-on-surface font-semibold">src/syntax/parser.rs</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-[10.5px] text-outline">Rust</span>
+<div class="flex items-center gap-1 text-[11px] font-code-inline ml-1">
+<span class="text-secondary font-bold">+3</span>
+<span class="text-error font-bold">-2</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center bg-surface-container rounded p-0.5 border border-outline-variant/30 text-[11px] font-label-md">
+<button class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-medium">Unified</button>
+<button class="px-2 py-0.5 rounded text-outline hover:text-on-surface">Split</button>
+</div>
+<button class="px-2.5 py-1 rounded bg-secondary-container text-on-secondary-container hover:bg-secondary hover:text-on-secondary font-code-inline text-[11px] font-medium transition-all flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[13px]">check</span>
+<span>Stage Hunk (space)</span>
+</button>
+</div>
+</div>
+<!-- Rich Contributor Header / Commit Author Card -->
+<div class="px-3.5 py-2.5 bg-surface-container/60 border-b border-outline-variant/20 flex items-center justify-between flex-wrap gap-2">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Sayuri Arisawa" class="w-10 h-10 rounded-full object-cover ring-2 ring-primary/40 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/>
+<span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-secondary border-2 border-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[8px] text-surface font-bold">check</span>
+</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-[13.5px] font-semibold text-on-surface">Sayuri Arisawa</span>
+<span class="text-outline text-[11px] font-code-inline">&lt;s.arisawa@blur.internal&gt;</span>
+<span class="px-1.5 py-0.2 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-code-inline flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[11px]">verified</span> GPG Verified
+                </span>
+</div>
+<div class="flex items-center gap-2 text-[11px] font-code-inline text-outline mt-0.5">
+<span>Commit: <strong class="text-primary font-medium">c49f82d</strong></span>
+<span>·</span>
+<span>Authored: 14m ago (Oct 24, 16:42:10)</span>
+<span>·</span>
+<span class="text-on-surface-variant font-medium">Branch: feature/ast-walker</span>
+</div>
+</div>
+</div>
+<!-- Co-authors mini block -->
+<div class="flex items-center gap-2 bg-surface-container-low px-2 py-1 rounded border border-outline-variant/20 text-[11px] font-code-inline">
+<span class="text-outline text-[10.5px]">Co-authored by:</span>
+<div class="flex items-center -space-x-1.5">
+<img alt="Tatsuo Mitsuno" class="w-5 h-5 rounded-full object-cover ring-1 ring-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIg9sLI0SBXHmgsBWAWkFcCy7oFD0VMxBCaks10hxP7tBTZNRpiwQ0oB7gMauC9ON3HcmWiS4JxyIJr8MKpq3z0LYBBpKMoi7ukFArKSwggexST0nvSonAOmY1s_pVHNq8pGSyj4k-sQHOqjQYlvSvjo1aEJg9YzKp_ENZPayB8uC0SjyGxKq2P0krGVRn2w1XIG6149G6C6U5UMLC58Z63TZvDoG24xPEUpBcbzs" title="Co-author: Tatsuo Mitsuno"/>
+<img alt="Malcolm Reid" class="w-5 h-5 rounded-full object-cover ring-1 ring-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3FWnRATDP9oXH25GOOP_vyhZ9kavgZsVksEluBtogd4kTxpc4cSm6FdQX4Azd3Dlk8Gc5Z1-CbmLY93RysMW3OYoP1Cx-hHAxHqbW3jPjd4UtROi2dfVZT88Ne_3c3RX7Ru6Umk8LZ6Kgld_pzf4j9SgXX-vXO4nc5IWg0eP7TaSp3ZSR9jMTk9txLqhnep6fQ_2EM_UtMRQmBvL89JMSB6Ril06tE6_He2sbK_E" title="Reviewer: Malcolm Reid"/>
+</div>
+<span class="text-on-surface text-[10px]">Tatsuo M., Malcolm R.</span>
+</div>
+</div>
+<!-- Hunk Navigation & Command Ribbon -->
+<div class="px-3 py-1 bg-[#15171d] border-b border-outline-variant/20 flex items-center justify-between text-[11px] font-code-inline text-outline select-none">
+<div class="flex items-center gap-3">
+<span class="text-primary-container font-semibold">@@ -142,11 +142,16 @@</span>
+<span class="text-on-surface-variant text-[11px]">pub fn advance_token_stream(&amp;mut self) -&gt; Result&lt;Token, ScanError&gt;</span>
+</div>
+<div class="flex items-center gap-2 text-[10.5px]">
+<span class="text-outline/70">Hunk 1 of 1</span>
+<span class="text-outline-variant">│</span>
+<button class="hover:text-on-surface cursor-pointer flex items-center gap-0.5"><kbd class="bg-surface-container px-1 rounded text-on-surface">k</kbd> prev hunk</button>
+<button class="hover:text-on-surface cursor-pointer flex items-center gap-0.5"><kbd class="bg-surface-container px-1 rounded text-on-surface">j</kbd> next hunk</button>
+<span class="text-outline-variant">│</span>
+<button class="text-primary hover:underline cursor-pointer"><kbd class="bg-surface-container px-1 rounded text-on-surface">v</kbd> line select</button>
+</div>
+</div>
+<!-- Diff Code Lines -->
+<div class="flex-1 overflow-auto font-code-inline text-[12px] bg-[#111318] p-1 select-text">
+<div class="w-full divide-y divide-outline-variant/5">
+<!-- Context Line 142 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">142</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">142</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline/80 whitespace-pre">    let mut current_lookahead = self.peek_cache.take();</div>
+</div>
+<!-- Context Line 143 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">143</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">143</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline/80 whitespace-pre">    if let Some(token) = current_lookahead {</div>
+</div>
+<!-- Deletion 1 -->
+<div class="flex items-stretch bg-[#2a1315]/80 hover:bg-[#34171a] py-0.5 leading-5 border-l-2 border-error transition-colors">
+<div class="w-10 text-right pr-2 text-error/80 select-none text-[11px]">144</div>
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-6 text-center text-error select-none font-bold">-</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        self.metrics.cached_hits </span><span class="text-error font-medium">+= 1;</span></div>
+</div>
+<!-- Deletion 2 -->
+<div class="flex items-stretch bg-[#2a1315]/80 hover:bg-[#34171a] py-0.5 leading-5 border-l-2 border-error transition-colors">
+<div class="w-10 text-right pr-2 text-error/80 select-none text-[11px]">145</div>
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-6 text-center text-error select-none font-bold">-</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        return </span><span class="text-tertiary">Ok</span><span class="text-outline">(token);</span></div>
+</div>
+<!-- Addition 1 -->
+<div class="flex items-stretch bg-[#11241f]/90 hover:bg-[#16302a] py-0.5 leading-5 border-l-2 border-secondary transition-colors">
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-10 text-right pr-2 text-secondary select-none text-[11px]">144</div>
+<div class="w-6 text-center text-secondary select-none font-bold">+</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        self.metrics.cached_hits.</span><span class="text-primary font-medium">fetch_add</span><span class="text-outline">(</span><span class="text-tertiary">1</span><span class="text-outline">, Ordering::</span><span class="text-secondary font-medium">Relaxed</span><span class="text-outline">);</span></div>
+</div>
+<!-- Addition 2 -->
+<div class="flex items-stretch bg-[#11241f]/90 hover:bg-[#16302a] py-0.5 leading-5 border-l-2 border-secondary transition-colors">
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-10 text-right pr-2 text-secondary select-none text-[11px]">145</div>
+<div class="w-6 text-center text-secondary select-none font-bold">+</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        self.state_counter.</span><span class="text-primary font-medium">advance</span><span class="text-outline">();</span></div>
+</div>
+<!-- Addition 3 -->
+<div class="flex items-stretch bg-[#11241f]/90 hover:bg-[#16302a] py-0.5 leading-5 border-l-2 border-secondary transition-colors">
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-10 text-right pr-2 text-secondary select-none text-[11px]">146</div>
+<div class="w-6 text-center text-secondary select-none font-bold">+</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        return </span><span class="text-tertiary">Ok</span><span class="text-outline">(token);</span></div>
+</div>
+<!-- Context Line 146 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">146</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">147</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline whitespace-pre">    }</div>
+</div>
+<!-- Context Line 147 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">147</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">148</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline whitespace-pre"></div>
+</div>
+<!-- Context Line 148 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">148</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">149</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline whitespace-pre">    let next_byte = self.reader.next_u8().map_err(|e| {</div>
+</div>
+<!-- Addition 4 -->
+<div class="flex items-stretch bg-[#11241f]/90 hover:bg-[#16302a] py-0.5 leading-5 border-l-2 border-secondary transition-colors">
+<div class="w-10 text-right pr-2 text-outline/20 select-none text-[11px]"></div>
+<div class="w-10 text-right pr-2 text-secondary select-none text-[11px]">150</div>
+<div class="w-6 text-center text-secondary select-none font-bold">+</div>
+<div class="flex-1 px-2 text-on-surface whitespace-pre"><span class="text-outline">        self.diagnostics.</span><span class="text-primary font-medium">record_fault</span><span class="text-outline">(self.cursor_position);</span></div>
+</div>
+<!-- Context Line 149 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">149</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">151</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline whitespace-pre">        ScanError::Io(e)</div>
+</div>
+<!-- Context Line 150 -->
+<div class="flex items-stretch hover:bg-surface-container-low/40 py-0.5 leading-5 font-normal">
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">150</div>
+<div class="w-10 text-right pr-2 text-outline/40 select-none text-[11px]">152</div>
+<div class="w-6 text-center text-outline/30 select-none"> </div>
+<div class="flex-1 px-2 text-outline whitespace-pre">    })?;</div>
+</div>
+</div>
+</div>
+<!-- Quick Commit Box at Bottom of Main Diff Pane -->
+<div class="p-2 bg-surface-container-lowest border-t border-outline-variant/30 flex items-center gap-2">
+<div class="relative flex-1">
+<input class="w-full bg-surface-container px-2.5 py-1.5 rounded font-code-inline text-[12px] text-on-surface placeholder:text-outline/40 border border-outline-variant/30 focus:outline-none focus:border-primary" placeholder="feat(parser): write commit message..." type="text"/>
+<span class="absolute right-2 top-1.5 text-[10px] text-outline font-code-inline">0/72</span>
+</div>
+<button class="px-3 py-1.5 rounded bg-primary-container text-on-primary-container hover:bg-primary hover:text-on-primary font-code-inline text-[11.5px] font-medium flex items-center gap-1.5 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[14px]">commit</span>
+<span>Commit (c)</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Lazygit Keybinding Bar Ribbon -->
+<footer class="fixed bottom-0 left-0 right-0 h-7 bg-surface-container-lowest/95 backdrop-blur-xl z-40 px-3 flex items-center justify-between text-outline font-code-inline text-[10.5px] border-t border-outline-variant/30 select-none shadow-[0_-1px_6px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-2 overflow-x-auto">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-primary font-bold border border-outline-variant/40">1..5</kbd> jump panel
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">h/l</kbd> prev/next
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">j/k</kbd> navigate
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-secondary">
+<kbd class="px-1 py-0.2 rounded bg-secondary-container/40 text-secondary border border-secondary/40 font-bold">space</kbd> stage
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">c</kbd> commit
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">P</kbd> push
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">p</kbd> pull
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">?</kbd> help
+      </span>
+</div>
+<div class="hidden md:flex items-center gap-3 text-outline/80">
+<span class="flex items-center gap-1">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">:</kbd> cmd
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">q</kbd> quit
+      </span>
+<span class="text-outline/30">│</span>
+<span class="text-secondary font-medium">Rust 1.78</span>
+<span class="text-outline/30">│</span>
+<span>UTF-8</span>
+</div>
+</footer>
+<script>
+    // Keyboard navigation simulation for lazygit feel
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        const input = document.querySelector('input[type="text"]');
+        if (input && input.value.trim() !== '') {
+          input.value = '';
+          input.placeholder = 'Commit recorded quietly to feature/ast-walker.';
+          setTimeout(() => {
+            input.placeholder = 'feat(parser): write commit message...';
+          }, 3000);
+        }
+      }
+    });
+  </script>
+</body></html>

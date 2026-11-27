@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-fixed": "#001e2f", "inverse-on-surface": "#2e3036", "surface-container-high": "#282a2f", "primary": "#9eccf0", "on-tertiary-container": "#3c2a00", "outline-variant": "#41474d", "secondary": "#9ed0c5", "secondary-fixed-dim": "#9ed0c5", "on-tertiary": "#412d00", "primary-container": "#6c99bb", "surface-variant": "#33353a", "surface-container": "#1e2025", "on-secondary-fixed": "#00201b", "on-error": "#690005", "on-primary-container": "#003049", "background": "#111318", "tertiary-container": "#b28f4a", "surface-container-low": "#1a1b21", "on-background": "#e2e2e9", "on-secondary": "#003730", "on-tertiary-fixed": "#261900", "tertiary-fixed": "#ffdea5", "error-container": "#93000a", "on-tertiary-fixed-variant": "#5d4201", "primary-fixed": "#c9e6ff", "secondary-container": "#1d4f46", "on-secondary-container": "#8dbfb4", "surface": "#111318", "surface-container-lowest": "#0c0e13", "on-primary": "#00344e", "secondary-fixed": "#baede1", "surface-tint": "#9eccf0", "on-error-container": "#ffdad6", "on-surface-variant": "#c1c7ce", "surface-dim": "#111318", "on-secondary-fixed-variant": "#1d4f46", "surface-container-highest": "#33353a", "tertiary": "#e9c176", "tertiary-fixed-dim": "#e9c176", "on-primary-fixed-variant": "#184b69", "inverse-surface": "#e2e2e9", "outline": "#8b9198", "inverse-primary": "#346382", "on-surface": "#e2e2e9", "primary-fixed-dim": "#9eccf0", "surface-bright": "#37393f", "error": "#ffb4ab" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-lg": "1.5rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter": "1rem", "gutter-mobile": "0.75rem", "space-sm": "0.5rem", "space-xl": "2.5rem", "margin": "2rem", "space-md": "0.875rem" }, "fontFamily": { "body-md": ["JetBrains Mono"], "body-lg": ["JetBrains Mono"], "headline-sm": ["Geist"], "headline-lg": ["Geist"], "headline-md": ["Geist"], "label-sm": ["Geist"], "label-md": ["Geist"], "code-inline": ["JetBrains Mono"], "body-sm": ["JetBrains Mono"] }, "fontSize": { "body-md": ["13.5px", { "lineHeight": "23px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["15px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "headline-lg": ["30px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "450" }], "code-inline": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "19px", "letterSpacing": "0.01em", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-highest selection:text-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-12 w-full px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-xs px-space-xs py-1 rounded bg-surface-container-low"><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span></div><span class="font-label-sm text-label-sm tracking-widest uppercase text-outline px-space-xs select-none">Blur</span><div class="hidden md:flex items-center text-outline text-label-sm font-label-sm"><span class="hover:text-on-surface-variant transition-colors cursor-pointer">src</span><span class="px-space-xs text-outline/40">/</span><span class="text-on-surface-variant font-code-inline text-code-inline">main.rs</span></div></div><nav class="flex items-center gap-space-xs bg-surface-container-low p-space-xs rounded overflow-x-auto" data-active-classes="bg-surface-container-high text-on-surface rounded font-label-md"><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="editor" href="#">Editor</a><a aria-current="page" class="px-space-sm py-space-xs transition-all whitespace-nowrap bg-surface-container-high text-on-surface rounded font-label-md" data-path="file-finder" href="#">File Finder</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="version-control" href="#">Version Control</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="protocols-lsp" href="#">Protocols &amp; LSP</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="utilities" href="#">Utilities</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="settings" href="#">Settings</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-xs rounded text-outline hover:text-on-surface-variant transition-colors cursor-pointer select-none"><span class="font-body-sm text-body-sm tracking-tight">⌘P</span><span class="text-outline/40">/</span><span class="font-body-sm text-body-sm tracking-tight">⌘K</span></div><div class="w-7 h-7 rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors flex items-center justify-center cursor-pointer text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">person</span></div></div></div></header><main class="w-full pt-12 pb-8 flex-1 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-[1560px] mx-auto px-gutter-mobile md:px-gutter lg:px-margin flex flex-col gap-space-md py-space-sm">
+<!-- Top Command Deck: Tabs, Ripgrep Status & Query Filters -->
+<div class="w-full bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm relative overflow-hidden">
+<!-- Subtle ambient gradient element -->
+<div class="absolute -right-24 -top-24 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+<!-- Mode Switcher & Telemetry Meta -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-xs">
+<div class="flex items-center gap-1.5 p-1 bg-surface-container-lowest rounded-lg">
+<button class="finder-tab px-space-md py-1 rounded bg-surface-container-high text-primary font-label-md text-label-md flex items-center gap-space-xs transition-colors" id="tab-quick-open">
+<span class="material-symbols-outlined text-[15px]">search</span>
+<span>Quick File Open</span>
+<span class="text-outline font-code-inline text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded">⌘P</span>
+</button>
+<button class="finder-tab px-space-md py-1 rounded text-outline hover:text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors" id="tab-ripgrep">
+<span class="material-symbols-outlined text-[15px]">manage_search</span>
+<span>Search in Project / Ripgrep</span>
+<span class="text-outline/70 font-code-inline text-label-sm px-1 rounded">⌘⇧F</span>
+</button>
+<button class="finder-tab px-space-md py-1 rounded text-outline hover:text-on-surface font-label-md text-label-md flex items-center gap-space-xs transition-colors" id="tab-recent">
+<span class="material-symbols-outlined text-[15px]">history</span>
+<span>Recent Buffers &amp; MRU</span>
+</button>
+</div>
+<div class="flex items-center gap-space-sm text-outline font-body-sm text-body-sm">
+<span class="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-lowest rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="text-secondary font-code-inline">ripgrep 14.1.0</span>
+<span class="text-outline/40">/</span>
+<span class="text-on-surface-variant">2.1ms</span>
+</span>
+<span class="hidden sm:inline-block px-space-sm py-1 bg-surface-container-lowest text-on-surface-variant rounded">14 matches · 4 files</span>
+</div>
+</div>
+<!-- Main Search Input Bar with embedded toggles -->
+<div class="w-full relative flex items-center bg-surface-container-lowest rounded-lg px-space-md py-2.5 focus-within:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mr-space-sm">terminal</span>
+<input autocomplete="off" class="w-full bg-transparent text-on-surface font-body-lg text-body-lg placeholder:text-outline/50 focus:outline-none tracking-tight" id="search-input" placeholder="Search filenames, symbols, or regex content..." spellcheck="false" type="text" value="src/protocol rust"/>
+<!-- Precision Modifiers -->
+<div class="flex items-center gap-1 shrink-0 ml-space-sm">
+<button class="px-2 py-1 rounded font-code-inline text-label-sm text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors" id="toggle-case" title="Match Case (Alt+C)">Aa</button>
+<button class="px-2 py-1 rounded font-code-inline text-label-sm text-primary bg-surface-container-high transition-colors" id="toggle-word" title="Whole Word (Alt+W)">\b</button>
+<button class="px-2 py-1 rounded font-code-inline text-label-sm text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors" id="toggle-regex" title="Use Regular Expression (Alt+R)">.*</button>
+<span class="h-4 w-[1px] bg-surface-container-highest mx-1"></span>
+<button class="px-2 py-1 rounded text-outline hover:text-on-surface text-label-sm font-label-md flex items-center gap-1 hover:bg-surface-container-high transition-colors" title="Clear Query">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+</div>
+<!-- Secondary Scoping Strip: Mask & Ignores -->
+<div class="flex flex-wrap items-center gap-space-sm text-body-sm font-body-sm text-outline">
+<div class="flex items-center gap-1.5 bg-surface-container-lowest px-space-sm py-1 rounded">
+<span class="text-outline text-label-sm font-label-sm uppercase tracking-wider">files:</span>
+<input class="bg-transparent text-secondary font-code-inline text-body-sm focus:outline-none w-28 sm:w-36" type="text" value="*.rs, *.toml"/>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container-lowest px-space-sm py-1 rounded">
+<span class="text-outline text-label-sm font-label-sm uppercase tracking-wider">exclude:</span>
+<input class="bg-transparent text-on-surface-variant font-code-inline text-body-sm focus:outline-none w-36 sm:w-48" type="text" value="target/, node_modules/"/>
+</div>
+<div class="hidden lg:flex items-center gap-2 ml-auto text-outline font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="px-1 py-0.5 rounded bg-surface-container-lowest font-code-inline text-[10px]">Rust 2021</span> active target</span>
+<span class="text-outline/30">•</span>
+<span>Index synced 24s ago</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace Split Pane -->
+<div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
+<!-- Left Column: Search Hit Tree & Explorer (~420px feel) -->
+<div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-space-sm bg-surface-container-low rounded-xl p-space-sm shadow-md">
+<!-- Results Counter & Sort Action -->
+<div class="flex items-center justify-between px-space-xs py-1 text-label-sm font-label-sm text-outline">
+<span class="uppercase tracking-wider">Ranked Fuzzy Matches</span>
+<div class="flex items-center gap-space-xs">
+<span class="hover:text-on-surface cursor-pointer">Score desc</span>
+<span class="text-outline/40">/</span>
+<span class="hover:text-on-surface cursor-pointer">Group files</span>
+</div>
+</div>
+<!-- Result List Container -->
+<div class="flex flex-col gap-1.5 max-h-[620px] overflow-y-auto pr-1">
+<!-- Hit Item 1: Selected / src/protocol.rs -->
+<div class="result-node group cursor-pointer bg-surface-container rounded-lg p-space-sm transition-all shadow-sm">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[16px] text-tertiary">data_object</span>
+<span class="font-code-inline text-body-md text-on-surface truncate font-semibold">src/protocol.rs</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-secondary/15 text-secondary font-label-sm text-label-sm font-medium">98.4%</span>
+<span class="text-outline text-label-sm font-label-sm">3 hits</span>
+</div>
+</div>
+<!-- Nested Line Matches -->
+<div class="flex flex-col gap-1 pl-space-md font-code-inline text-body-sm">
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded bg-surface-container-high text-on-surface">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">18</span>
+<span class="truncate">pub async fn <span class="bg-primary/25 text-primary px-0.5 rounded font-medium">dispatch_envelope</span>(&amp;self)</span>
+</div>
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">42</span>
+<span class="truncate">match msg { <span class="text-tertiary">Message</span>::<span class="bg-primary/25 text-primary px-0.5 rounded font-medium">Request</span>(req) =&gt; ...</span>
+</div>
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">67</span>
+<span class="truncate">ProtocolHandler::orchestrate_lsp(&amp;mut ctx)</span>
+</div>
+</div>
+</div>
+<!-- Hit Item 2: src/transport/codec.rs -->
+<div class="result-node group cursor-pointer bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-sm transition-all">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[16px] text-outline">description</span>
+<span class="font-code-inline text-body-md text-on-surface truncate">src/transport/codec.rs</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">89.2%</span>
+<span class="text-outline text-label-sm font-label-sm">2 hits</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 pl-space-md font-code-inline text-body-sm text-on-surface-variant">
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded hover:bg-surface-container-high transition-colors">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">12</span>
+<span class="truncate">impl Decoder for <span class="text-tertiary">LSPCodec</span> {</span>
+</div>
+</div>
+</div>
+<!-- Hit Item 3: src/session.rs -->
+<div class="result-node group cursor-pointer bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-sm transition-all">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[16px] text-outline">description</span>
+<span class="font-code-inline text-body-md text-on-surface truncate">src/session.rs</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">84.1%</span>
+<span class="text-outline text-label-sm font-label-sm">5 hits</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 pl-space-md font-code-inline text-body-sm text-on-surface-variant">
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded hover:bg-surface-container-high transition-colors">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">08</span>
+<span class="truncate">use crate::protocol::{<span class="text-primary font-medium">Envelope</span>, State};</span>
+</div>
+</div>
+</div>
+<!-- Hit Item 4: src/main.rs -->
+<div class="result-node group cursor-pointer bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-sm transition-all">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[16px] text-outline">code</span>
+<span class="font-code-inline text-body-md text-on-surface truncate">src/main.rs</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">81.0%</span>
+<span class="text-outline text-label-sm font-label-sm">4 hits</span>
+</div>
+</div>
+<div class="flex flex-col gap-1 pl-space-md font-code-inline text-body-sm text-on-surface-variant">
+<div class="flex items-baseline gap-2 py-0.5 px-1.5 rounded hover:bg-surface-container-high transition-colors">
+<span class="text-outline font-label-sm w-5 shrink-0 text-right">31</span>
+<span class="truncate">let handler = protocol::create_runtime();</span>
+</div>
+</div>
+</div>
+<!-- Hit Item 5: Cargo.toml -->
+<div class="result-node group cursor-pointer bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-sm transition-all">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-[16px] text-outline">settings</span>
+<span class="font-code-inline text-body-md text-on-surface truncate">Cargo.toml</span>
+</div>
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">75.3%</span>
+<span class="text-outline text-label-sm font-label-sm">1 hit</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Shortcuts Footer -->
+<div class="mt-space-xs pt-space-xs bg-surface-container-lowest rounded-lg p-2.5 flex items-center justify-between text-outline text-label-sm font-label-sm">
+<span class="flex items-center gap-1">
+<span class="font-code-inline text-[11px] text-on-surface-variant bg-surface-container px-1 rounded">↑↓</span> traverse
+          </span>
+<span class="flex items-center gap-1">
+<span class="font-code-inline text-[11px] text-on-surface-variant bg-surface-container px-1 rounded">↵</span> select
+          </span>
+<span class="flex items-center gap-1">
+<span class="font-code-inline text-[11px] text-on-surface-variant bg-surface-container px-1 rounded">ƒ↵</span> right split
+          </span>
+<span class="flex items-center gap-1">
+<span class="font-code-inline text-[11px] text-on-surface-variant bg-surface-container px-1 rounded">esc</span> back
+          </span>
+</div>
+</div>
+<!-- Right Column: Instant Live Syntax-Highlighted File Preview -->
+<div class="lg:col-span-7 xl:col-span-8 flex flex-col bg-surface-container-low rounded-xl overflow-hidden shadow-md">
+<!-- Preview Meta & Target Action Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm px-space-md py-space-sm bg-surface-container-lowest">
+<div class="flex items-center gap-space-sm min-w-0">
+<span class="material-symbols-outlined text-tertiary text-[18px] shrink-0">data_object</span>
+<div class="flex items-baseline gap-1.5 min-w-0">
+<span class="font-label-md text-headline-sm text-on-surface font-semibold truncate">src/protocol.rs</span>
+<span class="font-code-inline text-label-sm text-outline">:18:14</span>
+</div>
+<span class="px-1.5 py-0.5 rounded bg-tertiary/15 text-tertiary font-label-sm text-label-sm">Uncommitted (+12, -2)</span>
+</div>
+<!-- Quick Jump CTA -->
+<div class="flex items-center gap-space-xs">
+<button class="bg-primary text-on-primary px-space-md py-1.5 rounded-lg font-label-md text-label-md flex items-center gap-1.5 hover:opacity-95 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+<span>Open at Line 18 (↵)</span>
+</button>
+</div>
+</div>
+<!-- Breadcrumb & Diagnostics Telemetry -->
+<div class="px-space-md py-1.5 bg-surface-container-lowest/60 flex items-center justify-between text-outline text-label-sm font-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="hover:text-on-surface cursor-pointer">blur-workspace</span>
+<span class="text-outline/40">/</span>
+<span class="hover:text-on-surface cursor-pointer">src</span>
+<span class="text-outline/40">/</span>
+<span class="text-on-surface font-code-inline">protocol.rs</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span>74 lines · 1.84 KB</span>
+<span>Modified 14m ago by s. arisawa</span>
+</div>
+</div>
+<!-- Code Viewer with Line Gutter & Highlight Pill -->
+<div class="w-full p-space-md font-code-inline text-body-md bg-surface overflow-x-auto select-text leading-relaxed">
+<table class="w-full border-collapse">
+<tbody>
+<!-- Line 11 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">11</td>
+<td class="text-outline/80"><span class="text-secondary">use</span> std::sync::Arc;</td>
+</tr>
+<!-- Line 12 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">12</td>
+<td class="text-outline/80"><span class="text-secondary">use</span> tokio::sync::mpsc::Sender;</td>
+</tr>
+<!-- Line 13 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">13</td>
+<td class="text-outline/80"><span class="text-secondary">use</span> crate::transport::codec::LSPCodec;</td>
+</tr>
+<!-- Line 14 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">14</td>
+<td> </td>
+</tr>
+<!-- Line 15 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">15</td>
+<td class="text-outline/60"><span class="italic text-outline/60">/// Dispatches incoming JSON-RPC payload across synchronous receiver channels.</span></td>
+</tr>
+<!-- Line 16 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">16</td>
+<td class="text-outline/60"><span class="italic text-outline/60">/// Performs non-blocking backpressure inspection prior to buffer admission.</span></td>
+</tr>
+<!-- Line 17 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">17</td>
+<td class="text-on-surface"><span class="text-primary font-medium">#[inline(always)]</span></td>
+</tr>
+<!-- Line 18: KEY MATCH -->
+<tr class="bg-surface-container-high/90">
+<td class="w-10 pr-space-md text-right text-primary font-bold select-none text-label-sm align-top">18</td>
+<td class="text-on-surface">
+<span class="text-secondary">pub async fn</span> <span class="bg-primary/30 text-primary font-semibold px-1 rounded">dispatch_envelope</span>(&amp;<span class="text-tertiary">self</span>, payload: <span class="text-primary font-medium">Envelope</span>) -&gt; <span class="text-tertiary">Result</span>&lt;(), <span class="text-primary font-medium">LspError</span>&gt; {
+                </td>
+</tr>
+<!-- Line 19 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">19</td>
+<td class="text-on-surface-variant">    <span class="text-secondary">let</span> start_instant = std::time::Instant::<span class="text-primary">now</span>();</td>
+</tr>
+<!-- Line 20 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">20</td>
+<td class="text-on-surface-variant">    <span class="text-secondary">let</span> header = payload.extract_header()?;</td>
+</tr>
+<!-- Line 21 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">21</td>
+<td> </td>
+</tr>
+<!-- Line 22 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">22</td>
+<td class="text-on-surface-variant">    <span class="text-secondary">if</span> <span class="text-tertiary">self</span>.telemetry.is_enabled() {</td>
+</tr>
+<!-- Line 23 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">23</td>
+<td class="text-on-surface-variant">        <span class="text-tertiary">self</span>.telemetry.<span class="text-primary">record_inbound</span>(header.request_id, start_instant);</td>
+</tr>
+<!-- Line 24 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">24</td>
+<td class="text-on-surface-variant">    }</td>
+</tr>
+<!-- Line 25 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">25</td>
+<td> </td>
+</tr>
+<!-- Line 26 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">26</td>
+<td class="text-on-surface-variant">    <span class="text-secondary">match</span> payload.body {</td>
+</tr>
+<!-- Line 27 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">27</td>
+<td class="text-on-surface-variant">        <span class="text-tertiary">Message</span>::<span class="bg-primary/20 text-primary px-0.5 rounded font-medium">Request</span>(req) =&gt; {</td>
+</tr>
+<!-- Line 28 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">28</td>
+<td class="text-on-surface-variant">            <span class="text-tertiary">self</span>.router.<span class="text-primary">route_call</span>(req).<span class="text-secondary">await</span>?;</td>
+</tr>
+<!-- Line 29 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">29</td>
+<td class="text-on-surface-variant">        }</td>
+</tr>
+<!-- Line 30 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">30</td>
+<td class="text-on-surface-variant">        <span class="text-tertiary">Message</span>::Notification(note) =&gt; {</td>
+</tr>
+<!-- Line 31 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">31</td>
+<td class="text-on-surface-variant">            <span class="text-tertiary">self</span>.router.<span class="text-primary">broadcast_notification</span>(note).<span class="text-secondary">await</span>?;</td>
+</tr>
+<!-- Line 32 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">32</td>
+<td class="text-on-surface-variant">        }</td>
+</tr>
+<!-- Line 33 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">33</td>
+<td class="text-on-surface-variant">    }</td>
+</tr>
+<!-- Line 34 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">34</td>
+<td> </td>
+</tr>
+<!-- Line 35 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">35</td>
+<td class="text-on-surface-variant">    Ok(())</td>
+</tr>
+<!-- Line 36 -->
+<tr class="hover:bg-surface-container/50">
+<td class="w-10 pr-space-md text-right text-outline/50 select-none text-label-sm align-top">36</td>
+<td class="text-on-surface">}</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Preview Status Bar / Diagnostic summary -->
+<div class="px-space-md py-space-xs bg-surface-container-lowest flex items-center justify-between text-outline text-label-sm font-label-sm">
+<div class="flex items-center gap-space-md">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> 0 errors
+            </span>
+<span class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[14px]">warning</span> 1 lint advisory
+            </span>
+</div>
+<div class="flex items-center gap-space-sm font-code-inline text-body-sm">
+<span>LF</span>
+<span class="text-outline/30">•</span>
+<span>Tab: 4 spaces</span>
+<span class="text-outline/30">•</span>
+<span class="text-primary">Rust LSP Ready</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+    // Lightweight interactivity for tabs & search query toggle states
+    const tabs = document.querySelectorAll('.finder-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => {
+          t.classList.remove('bg-surface-container-high', 'text-primary');
+          t.classList.add('text-outline');
+        });
+        tab.classList.add('bg-surface-container-high', 'text-primary');
+        tab.classList.remove('text-outline');
+      });
+    });
+
+    const toggleRegex = document.getElementById('toggle-regex');
+    const toggleCase = document.getElementById('toggle-case');
+    const toggleWord = document.getElementById('toggle-word');
+
+    [toggleRegex, toggleCase, toggleWord].forEach(btn => {
+      if(!btn) return;
+      btn.addEventListener('click', () => {
+        const isActive = btn.classList.contains('text-primary');
+        if (isActive) {
+          btn.classList.remove('text-primary', 'bg-surface-container-high');
+          btn.classList.add('text-outline');
+        } else {
+          btn.classList.add('text-primary', 'bg-surface-container-high');
+          btn.classList.remove('text-outline');
+        }
+      });
+    });
+
+    // Keyboard selection traversal mock indicator
+    const resultNodes = document.querySelectorAll('.result-node');
+    resultNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        resultNodes.forEach(n => {
+          n.classList.remove('bg-surface-container', 'shadow-sm');
+          n.classList.add('bg-surface-container-lowest');
+        });
+        node.classList.remove('bg-surface-container-lowest');
+        node.classList.add('bg-surface-container', 'shadow-sm');
+      });
+    });
+  </script>
+</div></main><footer class="fixed bottom-0 left-0 right-0 h-8 bg-surface-container-lowest/90 backdrop-blur-xl z-40 px-space-md flex items-center justify-between text-outline font-body-sm text-body-sm shadow-[0_-1px_4px_rgba(0,0,0,0.3)] select-none"><div class="flex items-center gap-space-md"><span class="font-label-sm text-label-sm tracking-wider uppercase text-outline">NORMAL</span><span class="text-outline/30">|</span><span class="hover:text-on-surface-variant transition-colors cursor-pointer">main</span><span class="text-outline/30">|</span><span class="text-on-surface-variant">utf-8</span></div><div class="flex items-center gap-space-md"><span class="hover:text-on-surface-variant transition-colors cursor-pointer hidden sm:inline">rustc 1.78</span><span class="text-outline/30 hidden sm:inline">|</span><span class="text-on-surface-variant font-code-inline text-code-inline">42:18</span><span class="text-outline/30">|</span><span class="text-on-surface-variant">spaces: 4</span><span class="text-outline/30">|</span><span class="text-secondary font-label-sm text-label-sm">clean</span></div></footer></body></html>

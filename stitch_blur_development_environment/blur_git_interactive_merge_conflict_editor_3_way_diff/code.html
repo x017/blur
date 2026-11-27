@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base { 
+      html, body { margin: 0; padding: 0; } 
+      body { overscroll-behavior: none; } 
+      main > :first-child { margin-top: 0 !important; } 
+      main > :last-child { margin-bottom: 0 !important; } 
+    } 
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #33353a; border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-high": "#282a2f",
+            "primary-container": "#6c99bb",
+            "on-tertiary": "#412d00",
+            "surface-container": "#1e2025",
+            "on-surface": "#e2e2e9",
+            "outline-variant": "#41474d",
+            "inverse-on-surface": "#2e3036",
+            "secondary-container": "#1d4f46",
+            "on-secondary-fixed": "#00201b",
+            "surface-variant": "#33353a",
+            "on-primary-container": "#003049",
+            "on-primary": "#00344e",
+            "primary": "#9eccf0",
+            "on-secondary-fixed-variant": "#1d4f46",
+            "on-background": "#e2e2e9",
+            "tertiary-container": "#b28f4a",
+            "tertiary": "#e9c176",
+            "surface-tint": "#9eccf0",
+            "on-primary-fixed-variant": "#184b69",
+            "on-primary-fixed": "#001e2f",
+            "on-secondary-container": "#8dbfb4",
+            "on-error": "#690005",
+            "primary-fixed": "#c9e6ff",
+            "error-container": "#93000a",
+            "outline": "#8b9198",
+            "surface-dim": "#111318",
+            "on-surface-variant": "#c1c7ce",
+            "background": "#111318",
+            "on-tertiary-fixed": "#261900",
+            "on-tertiary-container": "#3c2a00",
+            "surface-bright": "#37393f",
+            "secondary-fixed-dim": "#9ed0c5",
+            "on-secondary": "#003730",
+            "error": "#ffb4ab",
+            "secondary-fixed": "#baede1",
+            "on-error-container": "#ffdad6",
+            "tertiary-fixed-dim": "#e9c176",
+            "inverse-primary": "#346382",
+            "inverse-surface": "#e2e2e9",
+            "primary-fixed-dim": "#9eccf0",
+            "secondary": "#9ed0c5",
+            "surface-container-highest": "#33353a",
+            "tertiary-fixed": "#ffdea5",
+            "surface": "#111318",
+            "surface-container-low": "#1a1b21",
+            "on-tertiary-fixed-variant": "#5d4201",
+            "surface-container-lowest": "#0c0e13"
+          },
+          fontFamily: {
+            "body-lg": ["JetBrains Mono"],
+            "body-md": ["JetBrains Mono"],
+            "label-sm": ["Geist"],
+            "code-inline": ["JetBrains Mono"],
+            "label-md": ["Geist"],
+            "headline-md": ["Geist"],
+            "headline-lg": ["Geist"],
+            "headline-sm": ["Geist"],
+            "body-sm": ["JetBrains Mono"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-highest selection:text-primary">
+<!-- Top Blur Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant/30">
+<div class="h-11 w-full px-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant cursor-pointer"></span>
+</div>
+<div class="flex items-center gap-1.5 pl-1">
+<span class="font-label-sm text-[11px] font-bold tracking-widest uppercase text-outline">BLUR</span>
+<span class="px-1 text-outline/30">/</span>
+<div class="hidden sm:flex items-center text-outline text-[12px] font-code-inline">
+<span class="hover:text-on-surface-variant transition-colors cursor-pointer">src</span>
+<span class="px-1 text-outline/30">/</span>
+<span class="text-on-surface font-medium">main.rs</span>
+</div>
+</div>
+</div>
+<nav class="flex items-center gap-1 bg-surface-container-low p-1 rounded border border-outline-variant/20" data-active-classes="bg-surface-container-high text-on-surface rounded font-label-md">
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="editor" href="#">Editor</a>
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="git" href="#">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span>Version Control</span>
+</a>
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="lsp" href="#">Protocols &amp; LSP</a>
+<a class="font-label-md text-[12px] px-2.5 py-1 text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="utilities" href="#">Utilities</a>
+</nav>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 bg-surface-container-low px-2 py-0.5 rounded border border-outline-variant/30 text-outline hover:text-on-surface-variant transition-colors cursor-pointer shadow-sm">
+<span class="font-code-inline text-[11px]">⌘K</span>
+<span class="text-[11px] font-label-sm text-outline/70">Palette</span>
+</div>
+<div class="relative flex items-center">
+<img alt="Active User Avatar" class="w-7 h-7 rounded-full object-cover ring-1 ring-primary/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/>
+<span class="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-secondary border border-surface-container-lowest"></span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Lazygit Terminal Layout -->
+<main class="w-full pt-11 pb-8 flex-1 bg-[#101216] overflow-hidden flex flex-col"><div class="flex flex-col w-full h-[calc(100vh-4.75rem)] select-none">
+<!-- Top Bar / Context & Merge Control Header -->
+<header class="bg-surface-container-low px-gutter py-2 flex flex-col gap-2 shrink-0 shadow-sm">
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-3 min-w-0">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-body-lg">merge_type</span>
+<span class="font-code-inline text-body-md text-on-surface">src/syntax/parser.rs</span>
+</span>
+<span class="text-outline text-label-sm">/</span>
+<span class="bg-surface-container-high text-tertiary px-2 py-0.5 rounded font-label-sm text-label-sm flex items-center gap-1.5 shadow-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          CONFLICT: 3 hunks (2 resolved, 1 remaining)
+        </span>
+</div>
+<!-- Quick Resolution Macro Bar -->
+<div class="flex items-center gap-1.5 shrink-0">
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface px-3 py-1 rounded font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm" id="btn-take-ours">
+<span class="material-symbols-outlined text-label-sm text-error">keyboard_double_arrow_left</span>
+          Accept Current (Ours)
+        </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface px-3 py-1 rounded font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm" id="btn-take-theirs">
+<span class="material-symbols-outlined text-label-sm text-secondary">keyboard_double_arrow_right</span>
+          Accept Incoming (Theirs)
+        </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface px-3 py-1 rounded font-label-md text-label-md flex items-center gap-1.5 transition-colors shadow-sm" id="btn-take-both">
+<span class="material-symbols-outlined text-label-sm text-tertiary">difference</span>
+          Accept Both
+        </button>
+<button class="bg-surface-container hover:bg-surface-container-high text-outline hover:text-on-surface px-2.5 py-1 rounded font-label-md text-label-md flex items-center gap-1 transition-colors shadow-sm" id="btn-toggle-base">
+<span class="material-symbols-outlined text-label-sm">visibility</span>
+<span>Base Column</span>
+</button>
+<div class="w-2 h-4"></div>
+<button class="bg-primary text-on-primary hover:bg-primary-fixed px-3.5 py-1 rounded font-label-md text-label-md font-medium flex items-center gap-2 transition-all shadow-md" id="btn-complete-merge">
+<span class="material-symbols-outlined text-label-md">done_all</span>
+          Complete Merge &amp; Stage
+          <kbd class="bg-on-primary-fixed-variant text-on-primary px-1 py-0.2 rounded font-code-inline text-label-sm">⌘↵</kbd>
+</button>
+</div>
+</div>
+<!-- Integration Sub-banner -->
+<div class="bg-surface-container-lowest px-3 py-1.5 rounded flex items-center justify-between text-body-sm font-code-inline text-outline shadow-inner">
+<div class="flex items-center gap-2">
+<span class="text-tertiary font-medium">Auto-merging:</span>
+<span class="text-on-surface-variant font-medium">origin/feature/ast-walker</span>
+<span class="text-outline">into</span>
+<span class="text-primary font-medium">HEAD (main)</span>
+<span class="text-outline">via 3-way recursive strategy</span>
+</div>
+<div class="flex items-center gap-4 text-label-sm font-label-sm">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-body-sm text-outline">account_tree</span>
+          Base ancestor: <span class="text-on-surface font-code-inline">f17c49b</span>
+</span>
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-body-sm">check_circle</span>
+          Hunks 1 &amp; 3 reconciled
+        </span>
+</div>
+</div>
+</header>
+<!-- Interactive 3-Column Split Diff Area -->
+<div class="grid grid-cols-12 gap-1.5 p-1.5 flex-1 min-h-0 bg-surface">
+<!-- LEFT COLUMN: CURRENT (HEAD / main) -->
+<section class="col-span-4 bg-surface-container-low rounded flex flex-col min-h-0 overflow-hidden shadow-sm">
+<div class="bg-surface-container-high px-3 py-1.5 flex items-center justify-between shrink-0 shadow-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="font-headline-sm text-body-sm text-on-surface font-semibold tracking-tight truncate">CURRENT CHANGE</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded text-outline font-code-inline text-label-sm">HEAD (main)</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-code-inline text-outline shrink-0">
+<img class="w-4 h-4 rounded-full object-cover" data-alt="Portrait photo of Japanese developer Sayuri Arisawa coding in a dark studio room, calm expression, muted cinematic tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmq6jqV55_WiSeVPmTX8vaWPe9CxKW8rh0W8psJlM-VABUomdEOSLieO0zWQEf9BteUkhgBZMAEeRBiYyR6vGVS-SdQnCom5eCgMU9pXpxK1FLGZ8hiwU8Gyf5uIRb4-K2QXiTbBe0Tn1rryrYN4HvUjScm2ALBhXN2FrF7zcEPcAYTf09fzFqt_0oHX8oZGiblFhUBtVFM1fSCfwolxRc1w5i5Kzr89cUieeZA4c"/>
+<span class="truncate">Sayuri A.</span>
+<span class="text-primary font-code-inline">8e3a201</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 font-code-inline text-code-inline leading-relaxed select-text bg-surface-container-lowest">
+<div class="text-outline/60">// Context: tokens lookahead synchronization</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">142</span><span class="text-primary">pub fn</span> <span class="text-secondary">advance_token_stream</span>(&amp;<span class="text-tertiary">mut self</span>) -&gt; <span class="text-secondary">Result</span>&lt;<span class="text-tertiary">Token</span>, <span class="text-error">SyntaxError</span>&gt; {</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">143</span> <span class="text-tertiary">let</span> current = <span class="text-tertiary">self</span>.cursor;</div>
+<!-- Conflict Block Left (Ours / Local) -->
+<div class="my-2 bg-error-container/20 rounded p-1.5 shadow-sm">
+<div class="flex items-center justify-between pb-1 mb-1 bg-surface-container-lowest/60 px-2 py-0.5 rounded">
+<span class="text-error font-semibold text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-body-sm">arrow_left</span> &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD (Current Change)
+            </span>
+<button class="bg-error/20 hover:bg-error/30 text-error px-2 py-0.5 rounded text-label-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-label-sm">check</span>
+              Use Ours
+            </button>
+</div>
+<div class="text-on-surface font-code-inline pl-2 space-y-0.5">
+<div><span class="text-outline mr-2">144</span> <span class="text-tertiary">if self</span>.peek_is_macro_invocation() {</div>
+<div><span class="text-outline mr-2">145</span> <span class="text-tertiary">self</span>.expand_macro_buffer_inline()?;</div>
+<div><span class="text-outline mr-2">146</span> <span class="text-tertiary">self</span>.sync_token_offsets();</div>
+<div><span class="text-outline mr-2">147</span>    }</div>
+</div>
+</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">148</span> <span class="text-tertiary">self</span>.cursor += <span class="text-tertiary">1</span>;</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">149</span> <span class="text-secondary">Ok</span>(<span class="text-tertiary">self</span>.arena.get(current).cloned())</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">150</span>}</div>
+</div>
+</section>
+<!-- MIDDLE COLUMN: BASE (Common Ancestor) -->
+<section class="col-span-4 bg-surface-container-low rounded flex flex-col min-h-0 overflow-hidden shadow-sm transition-all duration-150" id="column-base">
+<div class="bg-surface-container-high px-3 py-1.5 flex items-center justify-between shrink-0 shadow-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-headline-sm text-body-sm text-on-surface font-semibold tracking-tight truncate">BASE ANCESTOR</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded text-outline font-code-inline text-label-sm">f17c49b</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-code-inline text-outline shrink-0">
+<span class="text-outline">Common merge base</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 font-code-inline text-code-inline leading-relaxed select-text bg-surface-container-lowest">
+<div class="text-outline/60">// Context: tokens lookahead synchronization</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">142</span><span class="text-primary">pub fn</span> <span class="text-secondary">advance_token_stream</span>(&amp;<span class="text-tertiary">mut self</span>) -&gt; <span class="text-secondary">Result</span>&lt;<span class="text-tertiary">Token</span>, <span class="text-error">SyntaxError</span>&gt; {</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">143</span> <span class="text-tertiary">let</span> current = <span class="text-tertiary">self</span>.cursor;</div>
+<!-- Original Code Block -->
+<div class="my-2 bg-surface-container rounded p-1.5 shadow-sm opacity-80">
+<div class="flex items-center justify-between pb-1 mb-1 px-2 py-0.5 text-outline text-label-sm">
+<span class="flex items-center gap-1 font-semibold">
+<span class="material-symbols-outlined text-body-sm">history</span> Original Common Base
+            </span>
+<span class="text-label-sm">v0.41.0</span>
+</div>
+<div class="text-outline pl-2 space-y-0.5">
+<div><span class="text-outline mr-2">144</span> <span class="text-tertiary">if self</span>.has_pending_lookahead() {</div>
+<div><span class="text-outline mr-2">145</span> <span class="text-tertiary">self</span>.flush_lookahead();</div>
+<div><span class="text-outline mr-2">146</span>    }</div>
+</div>
+</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">147</span> <span class="text-tertiary">self</span>.cursor += <span class="text-tertiary">1</span>;</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">148</span> <span class="text-secondary">Ok</span>(<span class="text-tertiary">self</span>.arena.get(current).cloned())</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">149</span>}</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: INCOMING (feature/ast-walker) -->
+<section class="col-span-4 bg-surface-container-low rounded flex flex-col min-h-0 overflow-hidden shadow-sm">
+<div class="bg-surface-container-high px-3 py-1.5 flex items-center justify-between shrink-0 shadow-sm">
+<div class="flex items-center gap-2 min-w-0">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-headline-sm text-body-sm text-on-surface font-semibold tracking-tight truncate">INCOMING CHANGE</span>
+<span class="bg-surface-container px-1.5 py-0.2 rounded text-secondary font-code-inline text-label-sm">feature/ast-walker</span>
+</div>
+<div class="flex items-center gap-1.5 text-label-sm font-code-inline text-outline shrink-0">
+<img class="w-4 h-4 rounded-full object-cover" data-alt="Portrait photo of developer Tatsuo Mitsuno focused at monitor, soft cinematic studio side lighting, serene mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHBegMJV1y8Ax8NpoI8G6C3QgMTZdtcBjKA3L5R265ALY6zwzjkOStSf1dbx1FXAoVPa524jgztXHjURBFKgssbAvpAy4eSFotA5w450iE-6Qgpsx4bNbJRvdS-j4CEZlPDUK5LbnnunTVRivfdLjZEpDr13yeTjOKLcms3aWHYb3qIW4ATBsQZt_jvVBNvnDUdZjdoaApo04MYpfGwMOgFaCh-E1_AaSMXKzP5ns"/>
+<span class="truncate">Tatsuo M.</span>
+<span class="text-secondary font-code-inline">c49f82d</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 font-code-inline text-code-inline leading-relaxed select-text bg-surface-container-lowest">
+<div class="text-outline/60">// Context: tokens lookahead synchronization</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">142</span><span class="text-primary">pub fn</span> <span class="text-secondary">advance_token_stream</span>(&amp;<span class="text-tertiary">mut self</span>) -&gt; <span class="text-secondary">Result</span>&lt;<span class="text-tertiary">Token</span>, <span class="text-error">SyntaxError</span>&gt; {</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">143</span> <span class="text-tertiary">let</span> current = <span class="text-tertiary">self</span>.cursor;</div>
+<!-- Conflict Block Right (Theirs / Remote) -->
+<div class="my-2 bg-secondary-container/25 rounded p-1.5 shadow-sm">
+<div class="flex items-center justify-between pb-1 mb-1 bg-surface-container-lowest/60 px-2 py-0.5 rounded">
+<span class="text-secondary font-semibold text-label-sm flex items-center gap-1">
+              &gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/feature/ast-walker <span class="material-symbols-outlined text-body-sm">arrow_right</span>
+</span>
+<button class="bg-secondary/20 hover:bg-secondary/30 text-secondary px-2 py-0.5 rounded text-label-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-label-sm">check</span>
+              Use Theirs
+            </button>
+</div>
+<div class="text-on-surface font-code-inline pl-2 space-y-0.5">
+<div><span class="text-outline mr-2">144</span> <span class="text-tertiary">self</span>.pipeline.pre_evaluate_ast_nodes(&amp;<span class="text-tertiary">self</span>.cursor)?;</div>
+<div><span class="text-outline mr-2">145</span> <span class="text-tertiary">self</span>.cursor.fast_forward_lookahead_cache();</div>
+</div>
+</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">146</span> <span class="text-tertiary">self</span>.cursor += <span class="text-tertiary">1</span>;</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">147</span> <span class="text-secondary">Ok</span>(<span class="text-tertiary">self</span>.arena.get(current).cloned())</div>
+<div class="text-on-surface-variant"><span class="text-outline mr-2">148</span>}</div>
+</div>
+</section>
+</div>
+<!-- BOTTOM PANE: RESULT BUFFER (Interactive Synthesized Output) -->
+<section class="h-64 bg-surface-container-lowest flex flex-col shrink-0 shadow-lg">
+<!-- Buffer Status Ribbon -->
+<div class="bg-surface-container px-3 py-1 flex items-center justify-between text-body-sm font-code-inline shrink-0">
+<div class="flex items-center gap-3">
+<span class="text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-label-md">edit_document</span>
+          RESULT BUFFER (Interactive Output)
+        </span>
+<span class="text-outline">│</span>
+<span class="bg-surface-container-high px-2 py-0.2 rounded text-tertiary font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+          Hunk 2 of 3 unresolved
+        </span>
+<span class="text-outline/50 text-label-sm">Editing writes directly to merge index</span>
+</div>
+<!-- Navigation & Hunk Indicators -->
+<div class="flex items-center gap-2">
+<span class="text-outline text-label-sm">Hunk Jump:</span>
+<button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface px-1.5 py-0.5 rounded text-label-sm flex items-center">
+<span class="material-symbols-outlined text-label-sm">expand_less</span> Prev (p)
+        </button>
+<button class="bg-surface-container-low hover:bg-surface-container-high text-on-surface px-1.5 py-0.5 rounded text-label-sm flex items-center">
+<span class="material-symbols-outlined text-label-sm">expand_more</span> Next (n)
+        </button>
+<span class="text-secondary bg-secondary/15 px-2 py-0.5 rounded font-label-sm text-label-sm">Ready to synthesize</span>
+</div>
+</div>
+<!-- Live Code Buffer Area -->
+<div class="flex-1 overflow-y-auto p-3 font-code-inline text-code-inline leading-relaxed select-text bg-[#0e1014] relative">
+<div class="space-y-0.5 text-on-surface">
+<div class="flex items-center text-outline/50">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">140</span>
+<span>#[inline(always)]</span>
+</div>
+<div class="flex items-center text-outline/50">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">141</span>
+<span>// Thread-safe AST-aware cursor advance</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">142</span>
+<span><span class="text-primary">pub fn</span> <span class="text-secondary">advance_token_stream</span>(&amp;<span class="text-tertiary">mut self</span>) -&gt; <span class="text-secondary">Result</span>&lt;<span class="text-tertiary">Token</span>, <span class="text-error">SyntaxError</span>&gt; {</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">143</span>
+<span> <span class="text-tertiary">let</span> current = <span class="text-tertiary">self</span>.cursor;</span>
+</div>
+<!-- Synthesized Combined Conflict Region inside Target Buffer -->
+<div class="bg-surface-container-low/80 rounded py-1 my-1 px-1 shadow-inner">
+<div class="flex items-center text-on-surface bg-error/10 py-0.5">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-error font-bold">&gt;&gt;</span>
+<span class="text-error font-medium">    // [CONFLICT AUTO-COMBINED] Ours: inline macro expansion</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">144</span>
+<span> <span class="text-tertiary">if self</span>.peek_is_macro_invocation() {</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">145</span>
+<span> <span class="text-tertiary">self</span>.expand_macro_buffer_inline()?;</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">146</span>
+<span> <span class="text-tertiary">self</span>.sync_token_offsets();</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">147</span>
+<span>    }</span>
+</div>
+<div class="flex items-center text-on-surface bg-secondary/10 py-0.5 mt-1">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-secondary font-bold">&gt;&gt;</span>
+<span class="text-secondary font-medium">    // Theirs: AST-walker pipeline pre-evaluation cache</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">148</span>
+<span> <span class="text-tertiary">self</span>.pipeline.pre_evaluate_ast_nodes(&amp;<span class="text-tertiary">self</span>.cursor)?;</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">149</span>
+<span> <span class="text-tertiary">self</span>.cursor.fast_forward_lookahead_cache();</span>
+</div>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">150</span>
+<span> <span class="text-tertiary">self</span>.cursor += <span class="text-tertiary">1</span>;</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">151</span>
+<span> <span class="text-secondary">Ok</span>(<span class="text-tertiary">self</span>.arena.get(current).cloned())</span>
+</div>
+<div class="flex items-center text-on-surface">
+<span class="w-8 shrink-0 text-right pr-3 select-none text-outline">152</span>
+<span>}</span>
+</div>
+</div>
+</div>
+<!-- Quick Hotkeys Ribbon Footer -->
+<div class="bg-surface-container px-3 py-1 flex items-center justify-between text-outline font-code-inline text-label-sm shrink-0">
+<div class="flex items-center gap-2 overflow-x-auto">
+<span class="flex items-center gap-1 text-on-surface">
+<kbd class="px-1 py-0.2 rounded bg-surface-container-high text-primary font-bold">o</kbd> accept ours
+        </span>
+<span class="text-outline/40">·</span>
+<span class="flex items-center gap-1 text-on-surface">
+<kbd class="px-1 py-0.2 rounded bg-surface-container-high text-secondary font-bold">t</kbd> accept theirs
+        </span>
+<span class="text-outline/40">·</span>
+<span class="flex items-center gap-1 text-on-surface">
+<kbd class="px-1 py-0.2 rounded bg-surface-container-high text-tertiary font-bold">b</kbd> accept both
+        </span>
+<span class="text-outline/40">·</span>
+<span class="flex items-center gap-1 text-on-surface">
+<kbd class="px-1 py-0.2 rounded bg-surface-container-high text-on-surface">n / p</kbd> next/prev conflict
+        </span>
+<span class="text-outline/40">·</span>
+<span class="flex items-center gap-1 text-on-surface">
+<kbd class="px-1 py-0.2 rounded bg-surface-container-high text-on-surface">u</kbd> undo choice
+        </span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-secondary font-medium flex items-center gap-1">
+<kbd class="px-1 py-0.2 rounded bg-primary text-on-primary font-bold">⌘↵</kbd> save &amp; stage resolved file
+        </span>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Dynamic UI Micro-Interactions for Blur 3-Way Diff
+  const baseCol = document.getElementById('column-base');
+  const btnToggleBase = document.getElementById('btn-toggle-base');
+  
+  if (btnToggleBase && baseCol) {
+    btnToggleBase.addEventListener('click', () => {
+      const isHidden = baseCol.classList.contains('hidden');
+      if (isHidden) {
+        baseCol.classList.remove('hidden');
+        btnToggleBase.classList.remove('text-outline/50');
+        btnToggleBase.classList.add('text-outline');
+      } else {
+        baseCol.classList.add('hidden');
+        btnToggleBase.classList.add('text-outline/50');
+        btnToggleBase.classList.remove('text-outline');
+      }
+    });
+  }
+
+  // Interactive keyboard shortcuts simulation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'o' && !e.metaKey && !e.ctrlKey) {
+      const btn = document.getElementById('btn-take-ours');
+      if (btn) {
+        btn.classList.add('bg-error/30');
+        setTimeout(() => btn.classList.remove('bg-error/30'), 200);
+      }
+    } else if (e.key === 't' && !e.metaKey && !e.ctrlKey) {
+      const btn = document.getElementById('btn-take-theirs');
+      if (btn) {
+        btn.classList.add('bg-secondary/30');
+        setTimeout(() => btn.classList.remove('bg-secondary/30'), 200);
+      }
+    } else if (e.key === 'b' && !e.metaKey && !e.ctrlKey) {
+      const btn = document.getElementById('btn-take-both');
+      if (btn) {
+        btn.classList.add('bg-tertiary/30');
+        setTimeout(() => btn.classList.remove('bg-tertiary/30'), 200);
+      }
+    }
+  });
+</script></main>
+<!-- Bottom Lazygit Keybinding Bar Ribbon -->
+<footer class="fixed bottom-0 left-0 right-0 h-7 bg-surface-container-lowest/95 backdrop-blur-xl z-40 px-3 flex items-center justify-between text-outline font-code-inline text-[10.5px] border-t border-outline-variant/30 select-none shadow-[0_-1px_6px_rgba(0,0,0,0.4)]">
+<div class="flex items-center gap-2 overflow-x-auto">
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-primary font-bold border border-outline-variant/40">1..5</kbd> jump panel
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">h/l</kbd> prev/next
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">j/k</kbd> navigate
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-secondary">
+<kbd class="px-1 py-0.2 rounded bg-secondary-container/40 text-secondary border border-secondary/40 font-bold">space</kbd> stage
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">c</kbd> commit
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">P</kbd> push
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">p</kbd> pull
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1 text-on-surface-variant">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">?</kbd> help
+      </span>
+</div>
+<div class="hidden md:flex items-center gap-3 text-outline/80">
+<span class="flex items-center gap-1">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">:</kbd> cmd
+      </span>
+<span class="text-outline/30">│</span>
+<span class="flex items-center gap-1">
+<kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/40">q</kbd> quit
+      </span>
+<span class="text-outline/30">│</span>
+<span class="text-secondary font-medium">Rust 1.78</span>
+<span class="text-outline/30">│</span>
+<span>UTF-8</span>
+</div>
+</footer>
+<script>
+    // Keyboard navigation simulation for lazygit feel
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        const input = document.querySelector('input[type="text"]');
+        if (input && input.value.trim() !== '') {
+          input.value = '';
+          input.placeholder = 'Commit recorded quietly to feature/ast-walker.';
+          setTimeout(() => {
+            input.placeholder = 'feat(parser): write commit message...';
+          }, 3000);
+        }
+      }
+    });
+  </script>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-8 bg-[#090b0e]/75 backdrop-blur-md select-none transition-all" id="commit-graph-modal"><div class="w-full max-w-6xl h-[88vh] max-h-[860px] bg-[#111318] border border-outline-variant/40 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden ring-1 ring-primary/20"><div class="px-4 py-2.5 bg-surface-container-low border-b border-outline-variant/30 flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary flex items-center justify-center"><span class="material-symbols-outlined text-[9px] text-[#111318] font-bold">account_tree</span></span><span class="font-headline-sm text-[13.5px] font-semibold text-on-surface tracking-tight">Commit Graph &amp; Branch Topology</span></div><span class="text-outline-variant">│</span><div class="flex items-center gap-1 text-[11px] font-code-inline text-secondary bg-secondary/10 px-2 py-0.5 rounded border border-secondary/20"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span><span>DAG View · 28 commits across 4 branches</span></div></div><div class="flex items-center gap-3"><div class="flex items-center gap-1.5 text-[10.5px] font-code-inline text-outline"><span class="px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/30 text-on-surface-variant">feature/ast-walker</span><span class="text-outline/40">@</span><span class="text-primary font-medium">c49f82d</span></div><button class="flex items-center gap-1 px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-outline hover:text-on-surface text-[11px] font-code-inline transition-colors cursor-pointer" onclick="document.getElementById('commit-graph-modal').classList.add('hidden')"><kbd class="text-[10px] text-on-surface-variant font-semibold">ESC</kbd><span class="material-symbols-outlined text-[14px]">close</span></button></div></div><div class="px-3.5 py-2 bg-[#15171d] border-b border-outline-variant/20 flex items-center justify-between gap-3 shrink-0 flex-wrap text-[11px] font-code-inline"><div class="flex items-center gap-2 flex-1 min-w-[280px]"><div class="relative flex-1 max-w-sm"><input class="w-full bg-[#101216] pl-7 pr-3 py-1 rounded border border-outline-variant/30 text-[11px] font-code-inline text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-primary" placeholder="Filter commits, branches, authors... (/)" type="text"/><span class="material-symbols-outlined absolute left-2 top-1.5 text-[13px] text-outline/60">search</span></div><div class="flex items-center gap-1 bg-[#101216] p-0.5 rounded border border-outline-variant/25 text-[10.5px]"><button class="px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 font-medium">All Branches</button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors">main</button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors">feature/ast-walker</button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors">refactor/*</button></div></div><div class="flex items-center gap-2"><div class="flex items-center gap-1 bg-[#101216] p-0.5 rounded border border-outline-variant/25 text-[10.5px]"><button class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">view_list</span><span>Detailed</span></button><button class="px-2 py-0.5 rounded text-outline hover:text-on-surface transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">density_small</span><span>Compact</span></button></div><div class="flex items-center gap-1 text-[11px] font-code-inline text-outline border-l border-outline-variant/30 pl-2"><button class="p-1 rounded bg-[#101216] hover:bg-surface-container border border-outline-variant/20 hover:text-on-surface title='Zoom Out'"><span class="material-symbols-outlined text-[13px]">zoom_out</span></button><span class="text-[10px] px-1 text-on-surface-variant font-medium">100%</span><button class="p-1 rounded bg-[#101216] hover:bg-surface-container border border-outline-variant/20 hover:text-on-surface title='Zoom In'"><span class="material-symbols-outlined text-[13px]">zoom_in</span></button></div></div></div><div class="flex-1 flex min-h-0 bg-[#0d0f13] overflow-hidden"><div class="flex-1 flex flex-col min-h-0 overflow-y-auto select-text font-code-inline border-r border-outline-variant/30"><div class="px-3 py-1.5 bg-[#15171d]/80 border-b border-outline-variant/20 flex items-center text-[10px] text-outline uppercase tracking-wider select-none shrink-0"><div class="w-24 shrink-0">Graph</div><div class="w-20 shrink-0">Hash</div><div class="flex-1 min-w-0 px-2">Commit Message &amp; References</div><div class="w-40 shrink-0">Author</div><div class="w-20 text-right shrink-0 pr-2">Date</div></div><div class="divide-y divide-outline-variant/10 text-[11px]"><div class="flex items-center px-3 py-1.5 bg-primary/10 border-l-2 border-primary hover:bg-primary/15 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><line stroke="#88b04b" stroke-width="2.5" x1="12" x2="12" y1="0" y2="24"></line><circle cx="12" cy="12" fill="#9eccf0" r="5" stroke="#111318" stroke-width="2"></circle><circle cx="12" cy="12" fill="#00344e" r="2"></circle><line opacity="0.5" stroke="#6c99bb" stroke-width="2" x1="42" x2="42" y1="0" y2="24"></line></svg></div><div class="w-20 shrink-0 font-bold text-primary">c49f82d</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="px-1.5 py-0.2 rounded bg-secondary/20 text-secondary text-[9.5px] font-semibold border border-secondary/40 shrink-0 flex items-center gap-0.5"><span class="material-symbols-outlined text-[10px]">flag</span> HEAD -&gt; feature/ast-walker</span><span class="px-1.5 py-0.2 rounded bg-primary/20 text-primary text-[9.5px] border border-primary/30 shrink-0">origin/feature/ast-walker</span><span class="text-on-surface font-medium truncate">refactor: optimize token lookahead</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Sayuri Arisawa" class="w-4 h-4 rounded-full ring-1 ring-primary/40 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/><span class="truncate text-on-surface-variant font-medium">Sayuri Arisawa</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/80 text-[10px]">14m ago</div></div><div class="flex items-center px-3 py-1.5 hover:bg-surface-container-low/60 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><line stroke="#88b04b" stroke-width="2.5" x1="12" x2="12" y1="0" y2="24"></line><circle cx="12" cy="12" fill="#88b04b" r="4" stroke="#111318" stroke-width="2"></circle><line opacity="0.5" stroke="#6c99bb" stroke-width="2" x1="42" x2="42" y1="0" y2="24"></line></svg></div><div class="w-20 shrink-0 text-outline">8e3a201</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="text-on-surface-variant truncate group-hover:text-on-surface">fix(lsp): guard semantic tokens</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Tatsuo Mitsuno" class="w-4 h-4 rounded-full ring-1 ring-outline/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIg9sLI0SBXHmgsBWAWkFcCy7oFD0VMxBCaks10hxP7tBTZNRpiwQ0oB7gMauC9ON3HcmWiS4JxyIJr8MKpq3z0LYBBpKMoi7ukFArKSwggexST0nvSonAOmY1s_pVHNq8pGSyj4k-sQHOqjQYlvSvjo1aEJg9YzKp_ENZPayB8uC0SjyGxKq2P0krGVRn2w1XIG6149G6C6U5UMLC58Z63TZvDoG24xPEUpBcbzs"/><span class="truncate text-outline group-hover:text-on-surface-variant">Tatsuo Mitsuno</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/60 text-[10px]">2h ago</div></div><div class="flex items-center px-3 py-1.5 hover:bg-surface-container-low/60 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><path d="M 12 0 C 12 12, 42 12, 42 24" fill="none" stroke="#88b04b" stroke-width="2.5"></path><line stroke="#6c99bb" stroke-width="2.5" x1="42" x2="42" y1="0" y2="24"></line><circle cx="42" cy="12" fill="#6c99bb" r="4.5" stroke="#111318" stroke-width="2"></circle></svg></div><div class="w-20 shrink-0 text-outline">f17c49b</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="px-1.5 py-0.2 rounded bg-surface-container-high text-on-surface text-[9.5px] border border-outline-variant/40 shrink-0">main</span><span class="px-1.5 py-0.2 rounded bg-tertiary/20 text-tertiary text-[9.5px] border border-tertiary/30 shrink-0 flex items-center gap-0.5"><span class="material-symbols-outlined text-[10px]">bookmark</span> tag: v0.41.0</span><span class="text-on-surface-variant truncate group-hover:text-on-surface">perf: cache line offset indices</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Sayuri Arisawa" class="w-4 h-4 rounded-full ring-1 ring-outline/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/><span class="truncate text-outline group-hover:text-on-surface-variant">Sayuri Arisawa</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/60 text-[10px]">1d ago</div></div><div class="flex items-center px-3 py-1.5 hover:bg-surface-container-low/60 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><line stroke="#6c99bb" stroke-width="2.5" x1="42" x2="42" y1="0" y2="24"></line><path d="M 68 0 L 68 8 C 68 16, 42 16, 42 24" fill="none" stroke="#dfa974" stroke-dasharray="2 2" stroke-width="2"></path><circle cx="42" cy="12" fill="#6c99bb" r="4" stroke="#111318" stroke-width="2"></circle></svg></div><div class="w-20 shrink-0 text-outline">1a0bb3c</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="text-on-surface-variant truncate group-hover:text-on-surface">chore: bump tree-sitter bindings</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Malcolm Reid" class="w-4 h-4 rounded-full ring-1 ring-outline/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3FWnRATDP9oXH25GOOP_vyhZ9kavgZsVksEluBtogd4kTxpc4cSm6FdQX4Azd3Dlk8Gc5Z1-CbmLY93RysMW3OYoP1Cx-hHAxHqbW3jPjd4UtROi2dfVZT88Ne_3c3RX7Ru6Umk8LZ6Kgld_pzf4j9SgXX-vXO4nc5IWg0eP7TaSp3ZSR9jMTk9txLqhnep6fQ_2EM_UtMRQmBvL89JMSB6Ril06tE6_He2sbK_E"/><span class="truncate text-outline group-hover:text-on-surface-variant">Malcolm Reid</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/60 text-[10px]">3d ago</div></div><div class="flex items-center px-3 py-1.5 hover:bg-surface-container-low/60 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><line stroke="#6c99bb" stroke-width="2.5" x1="42" x2="42" y1="0" y2="24"></line><circle cx="42" cy="12" fill="#6c99bb" r="4" stroke="#111318" stroke-width="2"></circle></svg></div><div class="w-20 shrink-0 text-outline">7d110ca</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="text-on-surface-variant truncate group-hover:text-on-surface">merge: pull request #114 from ast-core</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Tatsuo Mitsuno" class="w-4 h-4 rounded-full ring-1 ring-outline/30 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIg9sLI0SBXHmgsBWAWkFcCy7oFD0VMxBCaks10hxP7tBTZNRpiwQ0oB7gMauC9ON3HcmWiS4JxyIJr8MKpq3z0LYBBpKMoi7ukFArKSwggexST0nvSonAOmY1s_pVHNq8pGSyj4k-sQHOqjQYlvSvjo1aEJg9YzKp_ENZPayB8uC0SjyGxKq2P0krGVRn2w1XIG6149G6C6U5UMLC58Z63TZvDoG24xPEUpBcbzs"/><span class="truncate text-outline group-hover:text-on-surface-variant">Tatsuo Mitsuno</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/60 text-[10px]">4d ago</div></div><div class="flex items-center px-3 py-1.5 hover:bg-surface-container-low/60 transition-colors cursor-pointer group"><div class="w-24 shrink-0 flex items-center"><svg class="w-20 h-6" viewbox="0 0 80 24"><line stroke="#6c99bb" stroke-width="2.5" x1="42" x2="42" y1="0" y2="24"></line><circle cx="42" cy="12" fill="#6c99bb" r="4" stroke="#111318" stroke-width="2"></circle></svg></div><div class="w-20 shrink-0 text-outline">3b88912</div><div class="flex-1 min-w-0 px-2 flex items-center gap-2 truncate"><span class="text-on-surface-variant truncate group-hover:text-on-surface">docs: clarify cursor synchronization invariant</span></div><div class="w-40 shrink-0 flex items-center gap-1.5"><img alt="Sayuri Arisawa" class="w-4 h-4 rounded-full ring-1 ring-primary/40 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/><span class="truncate text-outline group-hover:text-on-surface-variant">Sayuri Arisawa</span></div><div class="w-20 text-right shrink-0 pr-2 text-outline/60 text-[10px]">5d ago</div></div></div></div><div class="w-80 bg-surface-container-lowest flex flex-col min-h-0 overflow-y-auto shrink-0 border-l border-outline-variant/30"><div class="px-3 py-2 bg-surface-container-low border-b border-outline-variant/30 flex items-center justify-between text-[11px] font-code-inline shrink-0"><div class="flex items-center gap-1.5"><span class="text-primary font-bold">[Inspect Commit]</span><span class="text-outline/40">─</span><span class="text-on-surface font-semibold">c49f82d</span></div><span class="text-[10px] text-secondary bg-secondary/15 px-1.5 py-0.2 rounded border border-secondary/30">HEAD</span></div><div class="p-3 space-y-3 font-code-inline text-[11px]"><div class="flex items-start gap-2.5 pb-2.5 border-b border-outline-variant/20"><img alt="Sayuri Arisawa" class="w-9 h-9 rounded-full ring-2 ring-primary/40 object-cover shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgAayhaM8zXUe7weQRcnpuc4L9X-ianTXyIRVwBxx-fcPGF1tJVxjf4ibgt1nD-0DfWAmBn2OyAi-fBqFpjK3gik-3Whp-JvLJWdbylypmo1nFGmCzU7McwdfOi4XkR66MrCvID9A2okPqqn8pW5j6xcamkxlMso-SE02a0rV0t1l7i8SAb40zBhnxmZJrlJTsmB7TISmICrrsgoHt8IgF_-KeiM7j7bxqGx0JUw"/><div class="flex flex-col min-w-0 flex-1"><span class="font-headline-sm text-[12.5px] font-semibold text-on-surface leading-tight">refactor: optimize token lookahead</span><div class="flex items-center gap-1 text-[10.5px] text-outline mt-1"><span class="text-on-surface-variant">Sayuri Arisawa</span><span>·</span><span>14m ago</span></div><div class="flex items-center gap-1.5 mt-1.5"><span class="px-1.5 py-0.2 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[9.5px] flex items-center gap-0.5"><span class="material-symbols-outlined text-[10px]">verified</span> GPG Valid [F4C20B]</span><span class="text-[10px] text-secondary font-bold">+18</span><span class="text-[10px] text-error font-bold">-5</span></div></div></div><div class="space-y-1.5"><span class="text-[10px] uppercase font-bold text-outline tracking-wider">Branches &amp; Tags</span><div class="flex flex-wrap gap-1"><span class="px-1.5 py-0.5 rounded bg-secondary/15 text-secondary border border-secondary/30 text-[10px]">feature/ast-walker</span><span class="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px]">origin/feature/ast-walker</span></div></div><div class="space-y-1.5"><span class="text-[10px] uppercase font-bold text-outline tracking-wider">Changed Files (1)</span><div class="p-1.5 rounded bg-surface-container-low/70 border border-outline-variant/20 flex items-center justify-between text-[10.5px]"><span class="text-primary font-medium truncate">src/syntax/parser.rs</span><div class="flex items-center gap-1 shrink-0"><span class="text-secondary">+3</span><span class="text-error">-2</span></div></div></div><div class="space-y-1.5 pt-2 border-t border-outline-variant/20"><span class="text-[10px] uppercase font-bold text-outline tracking-wider">Quick Actions</span><div class="grid grid-cols-2 gap-1.5"><button class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded border border-outline-variant/30 text-on-surface text-[10.5px] flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[12px]">call_split</span><span>Checkout</span></button><button class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded border border-outline-variant/30 text-on-surface text-[10.5px] flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[12px]">content_copy</span><span>Cherry-pick</span></button><button class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded border border-outline-variant/30 text-on-surface text-[10.5px] flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[12px]">alt_route</span><span>Rebase onto</span></button><button class="px-2 py-1 bg-primary/20 hover:bg-primary/30 text-primary rounded border border-primary/40 text-[10.5px] font-medium flex items-center justify-center gap-1 transition-colors"><span class="material-symbols-outlined text-[12px]">add</span><span>New Branch</span></button></div></div></div></div></div><div class="px-3 py-1.5 bg-[#101216] border-t border-outline-variant/30 flex items-center justify-between text-outline font-code-inline text-[10px] shrink-0 select-none"><div class="flex items-center gap-2 overflow-x-auto"><span class="flex items-center gap-1 text-on-surface-variant"><kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/30">j/k</kbd> navigate</span><span>·</span><span class="flex items-center gap-1 text-on-surface-variant"><kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/30">↵</kbd> inspect</span><span>·</span><span class="flex items-center gap-1 text-secondary"><kbd class="px-1 py-0.2 rounded bg-secondary-container/40 text-secondary border border-secondary/40 font-bold">b</kbd> checkout branch</span><span>·</span><span class="flex items-center gap-1 text-on-surface-variant"><kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/30">m</kbd> merge</span><span>·</span><span class="flex items-center gap-1 text-on-surface-variant"><kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/30">r</kbd> rebase</span><span>·</span><span class="flex items-center gap-1 text-on-surface-variant"><kbd class="px-1 py-0.2 rounded bg-surface-container text-on-surface border border-outline-variant/30">esc</kbd> close graph</span></div><div class="flex items-center gap-2"><span class="text-secondary font-medium">DAG Engine active</span></div></div></div></div></body></html>

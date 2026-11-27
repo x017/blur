@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-fixed": "#001e2f", "inverse-on-surface": "#2e3036", "surface-container-high": "#282a2f", "primary": "#9eccf0", "on-tertiary-container": "#3c2a00", "outline-variant": "#41474d", "secondary": "#9ed0c5", "secondary-fixed-dim": "#9ed0c5", "on-tertiary": "#412d00", "primary-container": "#6c99bb", "surface-variant": "#33353a", "surface-container": "#1e2025", "on-secondary-fixed": "#00201b", "on-error": "#690005", "on-primary-container": "#003049", "background": "#111318", "tertiary-container": "#b28f4a", "surface-container-low": "#1a1b21", "on-background": "#e2e2e9", "on-secondary": "#003730", "on-tertiary-fixed": "#261900", "tertiary-fixed": "#ffdea5", "error-container": "#93000a", "on-tertiary-fixed-variant": "#5d4201", "primary-fixed": "#c9e6ff", "secondary-container": "#1d4f46", "on-secondary-container": "#8dbfb4", "surface": "#111318", "surface-container-lowest": "#0c0e13", "on-primary": "#00344e", "secondary-fixed": "#baede1", "surface-tint": "#9eccf0", "on-error-container": "#ffdad6", "on-surface-variant": "#c1c7ce", "surface-dim": "#111318", "on-secondary-fixed-variant": "#1d4f46", "surface-container-highest": "#33353a", "tertiary": "#e9c176", "tertiary-fixed-dim": "#e9c176", "on-primary-fixed-variant": "#184b69", "inverse-surface": "#e2e2e9", "outline": "#8b9198", "inverse-primary": "#346382", "on-surface": "#e2e2e9", "primary-fixed-dim": "#9eccf0", "surface-bright": "#37393f", "error": "#ffb4ab" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-lg": "1.5rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter": "1rem", "gutter-mobile": "0.75rem", "space-sm": "0.5rem", "space-xl": "2.5rem", "margin": "2rem", "space-md": "0.875rem" }, "fontFamily": { "body-md": ["JetBrains Mono"], "body-lg": ["JetBrains Mono"], "headline-sm": ["Geist"], "headline-lg": ["Geist"], "headline-md": ["Geist"], "label-sm": ["Geist"], "label-md": ["Geist"], "code-inline": ["JetBrains Mono"], "body-sm": ["JetBrains Mono"] }, "fontSize": { "body-md": ["13.5px", { "lineHeight": "23px", "letterSpacing": "0em", "fontWeight": "400" }], "body-lg": ["15px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "headline-lg": ["30px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "450" }], "code-inline": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "19px", "letterSpacing": "0.01em", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-highest selection:text-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-12 w-full px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><div class="flex items-center gap-space-xs px-space-xs py-1 rounded bg-surface-container-low"><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span></div><span class="font-label-sm text-label-sm tracking-widest uppercase text-outline px-space-xs select-none">Blur</span><div class="hidden md:flex items-center text-outline text-label-sm font-label-sm"><span class="hover:text-on-surface-variant transition-colors cursor-pointer">src</span><span class="px-space-xs text-outline/40">/</span><span class="text-on-surface-variant font-code-inline text-code-inline">main.rs</span></div></div><nav class="flex items-center gap-1.5 bg-surface-container-low p-1 rounded-full overflow-x-auto shadow-inner border border-outline-variant/20" data-active-classes="bg-surface-container-highest text-on-surface rounded-full shadow-sm font-label-md"><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="editor" href="#">Editor</a><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="file-finder" href="#">File Finder</a><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="version-control" href="#">Version Control</a><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="protocols-lsp" href="#">Protocols &amp; LSP</a><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="utilities" href="#">Utilities</a><a aria-current="page" class="px-space-md py-1 transition-all whitespace-nowrap bg-surface-container-highest text-on-surface rounded-full shadow-sm font-label-md" data-path="theme" href="#">Theme</a><a class="font-label-md text-label-md px-space-md py-1 text-on-surface-variant rounded-full hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap" data-path="settings" href="#">Settings</a></nav><div class="flex items-center gap-space-sm shrink-0"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-xs rounded-full text-outline hover:text-on-surface-variant transition-colors cursor-pointer select-none border border-outline-variant/10"><span class="font-body-sm text-body-sm tracking-tight">⌘P</span><span class="text-outline/40">/</span><span class="font-body-sm text-body-sm tracking-tight">⌘K</span></div><div class="w-7 h-7 rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors flex items-center justify-center cursor-pointer text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">person</span></div></div></div></header><main class="w-full pt-12 pb-8 flex-1 bg-surface"><div class="flex flex-col w-full">
+<!-- Sub-header Breadcrumb Bar & Quick Operations -->
+<div class="w-full bg-surface-container-lowest px-space-md py-space-sm flex flex-wrap items-center justify-between gap-space-sm border-b border-outline-variant/15">
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-outline">
+<span class="tracking-widest uppercase text-outline/80">Preferences</span>
+<span class="text-outline/40">/</span>
+<span class="text-on-surface font-label-md text-label-md">Appearance &amp; Theme Studio</span>
+<span class="text-outline/30 mx-1 hidden sm:inline">·</span>
+<span class="hidden sm:inline-flex items-center gap-1 font-code-inline text-code-inline text-on-surface-variant bg-surface-container px-space-xs py-0.5 rounded">
+<span class="material-symbols-outlined text-[13px] text-outline">description</span>
+        ~/.config/blur/theme.toml
+      </span>
+<span class="font-body-sm text-body-sm text-secondary bg-surface-container-low px-1.5 py-0.5 rounded ml-1">sync</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface px-space-sm py-1 rounded transition-colors text-label-md font-label-md border border-outline-variant/20" id="btn-save-preset">
+<span class="material-symbols-outlined text-[15px] text-tertiary">bookmark_add</span>
+<span>Save as Preset</span>
+</button>
+<button class="flex items-center gap-1.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface px-space-sm py-1 rounded transition-colors text-label-md font-label-md border border-outline-variant/20" id="btn-export">
+<span class="material-symbols-outlined text-[15px]">file_download</span>
+<span>Export (.toml)</span>
+</button>
+<button class="flex items-center gap-1.5 bg-primary-container text-on-primary-container px-space-md py-1 rounded transition-opacity hover:opacity-90 text-label-md font-label-md font-medium" id="btn-preview">
+<span class="material-symbols-outlined text-[15px]">visibility</span>
+<span>Preview Live Buffer</span>
+</button>
+</div>
+</div>
+<!-- TOP STUDIO TABS NAVIGATION -->
+<div class="w-full bg-surface-container-lowest/60 border-b border-outline-variant/20 sticky top-12 z-30 backdrop-blur-md">
+<div class="max-w-[1480px] mx-auto px-space-md md:px-space-lg flex items-center justify-between gap-4 overflow-x-auto py-1.5">
+<div class="flex items-center gap-1.5">
+<!-- Tab 1: Presets & Palettes -->
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">palette</span>
+<span>Presets &amp; Palettes</span>
+</button>
+<!-- Tab 2: Colors & Tokens (ACTIVE) -->
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-label-md font-label-md bg-surface-container-highest text-primary font-medium shadow-sm border border-primary/20 transition-all whitespace-nowrap">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>Colors &amp; Tokens</span>
+<span class="text-[10px] font-code-inline uppercase tracking-wider bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">Active</span>
+</button>
+<!-- Tab 3: Tab & Window Geometry -->
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">rounded_corner</span>
+<span>Tab &amp; Window Geometry</span>
+</button>
+<!-- Tab 4: Syntax & Code Engine -->
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+<span>Syntax &amp; Code Engine</span>
+</button>
+<!-- Tab 5: Backdrop & Glass -->
+<button class="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-label-md font-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">blur_on</span>
+<span>Backdrop &amp; Glass</span>
+</button>
+</div>
+<div class="hidden lg:flex items-center gap-2 text-outline font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>Customizer Engine v2.4</span>
+</div>
+</div>
+</div>
+<!-- Studio Shell Layout -->
+<div class="w-full max-w-[1480px] mx-auto p-space-md md:p-space-lg lg:p-space-xl flex flex-col lg:flex-row gap-space-lg">
+<!-- LEFT SIDEBAR: Topic Navigation & Metric Badges -->
+<aside class="w-full lg:w-64 shrink-0 flex flex-col gap-space-md">
+<div class="bg-surface-container-low p-space-sm rounded-lg flex flex-col gap-1 border border-outline-variant/15">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline px-space-xs py-1 select-none">Studio Sections</span>
+<button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded text-left hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+<span class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline/40"></span>
+            Presets &amp; Atmosphere
+          </span>
+<span class="font-body-sm text-body-sm text-outline">01</span>
+</button>
+<button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded text-left bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors">
+<span class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+            Colors &amp; Tokens
+          </span>
+<span class="font-body-sm text-body-sm text-primary font-code-inline">02</span>
+</button>
+<button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded text-left hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+<span class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline/40"></span>
+            Tab Bar &amp; Geometry
+          </span>
+<span class="font-body-sm text-body-sm text-outline">03</span>
+</button>
+<button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded text-left hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+<span class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline/40"></span>
+            Syntax &amp; Code Engine
+          </span>
+<span class="font-body-sm text-body-sm text-outline">04</span>
+</button>
+<button class="w-full flex items-center justify-between px-space-sm py-1.5 rounded text-left hover:bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors">
+<span class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline/40"></span>
+            Backdrop &amp; Glass
+          </span>
+<span class="font-body-sm text-body-sm text-outline">05</span>
+</button>
+</div>
+<!-- Quick Archetype Profile Card -->
+<div class="bg-surface-container-low p-space-md rounded-lg flex flex-col gap-space-sm border border-outline-variant/15">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Aesthetic Profile</span>
+<span class="font-body-sm text-body-sm text-secondary bg-secondary-container/40 px-1.5 py-0.5 rounded">furusato-custom</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Deep mineral obsidian <code class="text-primary font-code-inline">#111318</code> paired with granular cerulean &amp; soft olive semantic tokens. High ocular calm.
+        </p>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden flex">
+<div class="w-[45%] h-full bg-[#6c99bb]"></div>
+<div class="w-[20%] h-full bg-[#a8cd89]"></div>
+<div class="w-[20%] h-full bg-[#e5c07b]"></div>
+<div class="w-[15%] h-full bg-[#d19a66]"></div>
+</div>
+<div class="flex items-center justify-between pt-1 text-[11px] font-code-inline text-outline">
+<span>RAM: 2.1 MB</span>
+<span class="text-secondary flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span> 0 edits queued</span>
+</div>
+</div>
+<!-- Live Compiler Telemetry -->
+<div class="bg-surface-container-lowest p-space-md rounded-lg flex flex-col gap-2 border border-outline-variant/15">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Engine Constraints</span>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-outline">WCAG Target</span>
+<span class="text-on-surface">AAA (12.4:1)</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-outline">Buffer Repaint</span>
+<span class="text-secondary font-code-inline text-code-inline">&lt; 1.2ms</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-outline">GPU Shader</span>
+<span class="text-on-surface">Vulkan / Metal</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-outline">Tone Space</span>
+<span class="text-on-surface font-code-inline text-[11px]">Display P3 / D65</span>
+</div>
+</div>
+</aside>
+<!-- RIGHT/CENTER COLUMN: Configuration Grid & Interactive Canvas -->
+<div class="flex-1 flex flex-col gap-space-lg min-w-0">
+<!-- SECTION ACTIVE: Colors & Tokens Deep Customizer -->
+<section class="bg-surface-container-low p-space-md md:p-space-lg rounded-xl flex flex-col gap-space-lg border border-outline-variant/20 shadow-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs border-b border-outline-variant/15 pb-space-md">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary ring-4 ring-primary/20"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Colors &amp; Tokens Customizer</h2>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">
+          Fine-tune surface depths, semantic syntax highlights, and active accents for zero cognitive drag.
+        </p>
+</div>
+<div class="flex items-center gap-2 self-start sm:self-auto">
+<span class="font-body-sm text-body-sm text-secondary bg-surface-container-high px-2.5 py-1 rounded flex items-center gap-1.5 border border-outline-variant/20">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+<span>Deep Tuning</span>
+</span>
+</div>
+</div>
+<!-- SUB-SECTION A: Color Base & Surfaces -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+          Color Base &amp; Surfaces
+        </span>
+<span class="font-code-inline text-code-inline text-[11px] text-outline">Obsidian Layers</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-sm">
+<!-- Base Background -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-medium">Background / Base</span>
+<span class="text-[10px] font-code-inline text-outline uppercase">HSL 220° 17% 8%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-md bg-[#111318] border border-outline-variant/40 shrink-0 shadow-inner flex items-center justify-center relative cursor-pointer group">
+<input class="opacity-0 absolute inset-0 cursor-pointer w-full h-full" type="color" value="#111318"/>
+<span class="material-symbols-outlined text-[13px] text-outline opacity-0 group-hover:opacity-100">colorize</span>
+</div>
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1.5 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[12px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[12px] focus:ring-0 focus:outline-none w-full" type="text" value="111318"/>
+</div>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Root document canvas &amp; editor gutter base.</span>
+</div>
+<!-- Surface Layer -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-medium">Surface Layer</span>
+<span class="text-[10px] font-code-inline text-outline uppercase">HSL 227° 16% 10%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-md bg-[#16181f] border border-outline-variant/40 shrink-0 shadow-inner flex items-center justify-center relative cursor-pointer group">
+<input class="opacity-0 absolute inset-0 cursor-pointer w-full h-full" type="color" value="#16181f"/>
+<span class="material-symbols-outlined text-[13px] text-outline opacity-0 group-hover:opacity-100">colorize</span>
+</div>
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1.5 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[12px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[12px] focus:ring-0 focus:outline-none w-full" type="text" value="16181f"/>
+</div>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Sidebars, statusline, and card shells.</span>
+</div>
+<!-- Panel Elevated -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-medium">Panel Elevated</span>
+<span class="text-[10px] font-code-inline text-outline uppercase">HSL 225° 16% 15%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-md bg-[#1f222b] border border-outline-variant/40 shrink-0 shadow-inner flex items-center justify-center relative cursor-pointer group">
+<input class="opacity-0 absolute inset-0 cursor-pointer w-full h-full" type="color" value="#1f222b"/>
+<span class="material-symbols-outlined text-[13px] text-outline opacity-0 group-hover:opacity-100">colorize</span>
+</div>
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1.5 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[12px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[12px] focus:ring-0 focus:outline-none w-full" type="text" value="1f222b"/>
+</div>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Floating popovers, command palettes.</span>
+</div>
+<!-- Border / Gutter -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-medium">Border / Gutter</span>
+<span class="text-[10px] font-code-inline text-outline uppercase">HSL 224° 15% 20%</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-9 h-9 rounded-md bg-[#2b2f3a] border border-outline-variant/40 shrink-0 shadow-inner flex items-center justify-center relative cursor-pointer group">
+<input class="opacity-0 absolute inset-0 cursor-pointer w-full h-full" type="color" value="#2b2f3a"/>
+<span class="material-symbols-outlined text-[13px] text-outline opacity-0 group-hover:opacity-100">colorize</span>
+</div>
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1.5 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[12px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[12px] focus:ring-0 focus:outline-none w-full" type="text" value="2b2f3a"/>
+</div>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Separator micro-lines and line numbers.</span>
+</div>
+</div>
+</div>
+<!-- SUB-SECTION B: Accent & Key Accents -->
+<div class="flex flex-col gap-space-sm pt-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Accent &amp; Key Accents
+        </span>
+<span class="font-body-sm text-body-sm text-outline">Active Key Focus: <span class="text-primary font-code-inline">Cerulean Accent</span></span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-space-sm">
+<!-- Accent 1: Cerulean Accent (Selected) -->
+<button class="accent-chip p-2.5 rounded-lg bg-surface-container-high border-2 border-primary/80 flex flex-col gap-2 text-left relative transition-all group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface font-medium">Cerulean</span>
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+</div>
+<div class="h-7 w-full rounded bg-[#6c99bb] shadow-sm flex items-center justify-center">
+<span class="font-code-inline text-[11px] text-[#001e2f] font-semibold">#6c99bb</span>
+</div>
+<span class="font-label-sm text-[11px] text-primary">Primary Core</span>
+</button>
+<!-- Accent 2: Cyan Ice -->
+<button class="accent-chip p-2.5 rounded-lg bg-surface-container border border-outline-variant/30 hover:border-outline hover:bg-surface-container-high flex flex-col gap-2 text-left relative transition-all group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Cyan Ice</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface">radio_button_unchecked</span>
+</div>
+<div class="h-7 w-full rounded bg-[#38bdf8] shadow-sm flex items-center justify-center">
+<span class="font-code-inline text-[11px] text-[#082f49] font-semibold">#38bdf8</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline">Cryogenic Blue</span>
+</button>
+<!-- Accent 3: Pine Green -->
+<button class="accent-chip p-2.5 rounded-lg bg-surface-container border border-outline-variant/30 hover:border-outline hover:bg-surface-container-high flex flex-col gap-2 text-left relative transition-all group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Pine Green</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface">radio_button_unchecked</span>
+</div>
+<div class="h-7 w-full rounded bg-[#4ade80] shadow-sm flex items-center justify-center">
+<span class="font-code-inline text-[11px] text-[#052e16] font-semibold">#4ade80</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline">Natural Foliage</span>
+</button>
+<!-- Accent 4: Soft Amber -->
+<button class="accent-chip p-2.5 rounded-lg bg-surface-container border border-outline-variant/30 hover:border-outline hover:bg-surface-container-high flex flex-col gap-2 text-left relative transition-all group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Soft Amber</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface">radio_button_unchecked</span>
+</div>
+<div class="h-7 w-full rounded bg-[#f59e0b] shadow-sm flex items-center justify-center">
+<span class="font-code-inline text-[11px] text-[#451a03] font-semibold">#f59e0b</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline">Warm Glow</span>
+</button>
+<!-- Accent 5: Rose / Alert -->
+<button class="accent-chip p-2.5 rounded-lg bg-surface-container border border-outline-variant/30 hover:border-outline hover:bg-surface-container-high flex flex-col gap-2 text-left relative transition-all group">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface">Rose / Alert</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface">radio_button_unchecked</span>
+</div>
+<div class="h-7 w-full rounded bg-[#f87171] shadow-sm flex items-center justify-center">
+<span class="font-code-inline text-[11px] text-[#450a0a] font-semibold">#f87171</span>
+</div>
+<span class="font-label-sm text-[11px] text-outline">Calm Warning</span>
+</button>
+</div>
+</div>
+<!-- SUB-SECTION C: Syntax Highlighting Token Palette -->
+<div class="flex flex-col gap-space-sm pt-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+          Syntax Highlighting Token Palette
+        </span>
+<span class="font-code-inline text-code-inline text-[11px] text-outline">Treesitter &amp; TextMate Specs</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-space-sm">
+<!-- Token 1: Keyword / Fn -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#6c99bb] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Keyword / Fn</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-primary">#6c99bb</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" id="token-kw-input" type="text" value="6c99bb"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high text-outline hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/20">Bold</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Used for <code class="text-primary font-code-inline">fn, pub, impl, struct, use</code>.</span>
+</div>
+<!-- Token 2: Strings -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#a8cd89] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Strings &amp; Literals</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-[#a8cd89]">#a8cd89</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" id="token-str-input" type="text" value="a8cd89"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high text-outline hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/20">Regex</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Soft olive for raw and interpolated text strings.</span>
+</div>
+<!-- Token 3: Types & Traits -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#e5c07b] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Types &amp; Traits</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-[#e5c07b]">#e5c07b</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" id="token-type-input" type="text" value="e5c07b"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high text-outline hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/20">Class</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Warm ochre for structs, interfaces &amp; generics.</span>
+</div>
+<!-- Token 4: Constants / Numbers -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#d19a66] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Constants &amp; Numbers</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-[#d19a66]">#d19a66</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" type="text" value="d19a66"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high text-outline hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/20">Floats</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Terracotta for numeric literals and enums.</span>
+</div>
+<!-- Token 5: Comments (with italic toggle) -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#5c6370] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Comments &amp; Doc</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-[#5c6370]">#5c6370</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" type="text" value="5c6370"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-highest text-primary font-medium text-label-sm font-label-sm border border-primary/30 shadow-sm flex items-center gap-1" id="toggle-italic-comment">
+<span class="italic font-serif">I</span>
+<span>Italic</span>
+</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Muted slate with optional soft cursive tilt.</span>
+</div>
+<!-- Token 6: Operator & Punctuation -->
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/20 flex flex-col justify-between gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3.5 h-3.5 rounded bg-[#abb2bf] shadow-sm"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Operators &amp; Delimiters</span>
+</div>
+<span class="font-code-inline text-code-inline text-[11px] text-[#abb2bf]">#abb2bf</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 flex items-center bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant/30">
+<span class="text-outline font-code-inline text-[11px] mr-1">#</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-code-inline text-[11px] focus:ring-0 focus:outline-none w-full" type="text" value="abb2bf"/>
+</div>
+<button class="px-2 py-1 rounded bg-surface-container-high text-outline hover:text-on-surface text-label-sm font-label-sm border border-outline-variant/20">Braces</button>
+</div>
+<span class="text-[11px] font-body-sm text-outline">Subdued off-white for arrows, colons &amp; math.</span>
+</div>
+</div>
+</div>
+<!-- SUB-SECTION D: Granular Sliders -->
+<div class="flex flex-col gap-space-sm pt-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+        Granular Optical Tuning
+      </span>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md bg-surface-container p-space-md rounded-lg border border-outline-variant/15">
+<!-- Slider 1: Contrast Dampener -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-outline">Contrast Dampener</span>
+<span class="font-code-inline text-code-inline text-on-surface text-[12px]">1:12.4</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-surface-container-highest rounded-lg cursor-pointer" max="21" min="1" type="range" value="12"/>
+<span class="text-[10px] text-outline">Reduces white spike fatigue</span>
+</div>
+<!-- Slider 2: Saturation Multiplier -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-outline">Saturation Multiplier</span>
+<span class="font-code-inline text-code-inline text-secondary text-[12px]">-15%</span>
+</div>
+<input class="w-full accent-secondary h-1.5 bg-surface-container-highest rounded-lg cursor-pointer" max="50" min="-50" type="range" value="-15"/>
+<span class="text-[10px] text-outline">Calibrated gamut suppression</span>
+</div>
+<!-- Slider 3: Color Temperature -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-outline">Color Temperature</span>
+<span class="font-code-inline text-code-inline text-tertiary text-[12px]">5400 K</span>
+</div>
+<input class="w-full accent-tertiary h-1.5 bg-surface-container-highest rounded-lg cursor-pointer" max="6500" min="3200" step="100" type="range" value="5400"/>
+<span class="text-[10px] text-outline">Warm incandescent balance</span>
+</div>
+<!-- Slider 4: Glyph Glow/Bloom -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-outline">Glyph Glow / Bloom</span>
+<span class="font-code-inline text-code-inline text-primary text-[12px]">4%</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-surface-container-highest rounded-lg cursor-pointer" max="25" min="0" type="range" value="4"/>
+<span class="text-[10px] text-outline">Sub-pixel raster dispersion</span>
+</div>
+</div>
+</div>
+<!-- Action Footer Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-2 border-t border-outline-variant/15">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 text-secondary font-code-inline text-code-inline text-[12px] bg-secondary-container/30 px-2 py-1 rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          Ready to compile · No syntax conflicts
+        </span>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface px-space-md py-1.5 rounded transition-all text-label-md font-label-md border border-outline-variant/25" id="btn-save-custom-preset">
+<span class="material-symbols-outlined text-[15px] text-tertiary">bookmark</span>
+<span>Save as Preset</span>
+</button>
+<button class="flex items-center gap-1.5 bg-primary text-on-primary font-medium px-space-md py-1.5 rounded transition-all hover:brightness-110 text-label-md font-label-md shadow-sm" id="btn-export-toml">
+<span class="material-symbols-outlined text-[15px]">download</span>
+<span>Export Custom Theme (.toml)</span>
+</button>
+</div>
+</div>
+</section>
+<!-- SECTION: Top Tab Bar & Window Geometry Controls (Preserved & accessible) -->
+<section class="bg-surface-container-low p-space-md md:p-space-lg rounded-xl flex flex-col gap-space-md border border-outline-variant/20">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Tab Bar &amp; Window Geometry</h2>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">
+              Customize the physical contour, padding density, and curvature of the header buffer bar.
+            </p>
+</div>
+<span class="font-body-sm text-body-sm text-primary bg-surface-container-high px-2 py-0.5 rounded self-start sm:self-auto">
+            Interactive
+          </span>
+</div>
+<!-- Custom Round Tab Bar Toggle Card -->
+<div class="bg-surface-container p-space-md rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md border border-outline-variant/15">
+<div class="flex flex-col gap-0.5 max-w-xl">
+<span class="font-label-md text-label-md text-on-surface flex items-center gap-2">
+<span>Custom Continuous Tab Geometry</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.2 rounded bg-secondary/15 text-secondary">Active</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+              Applies soft continuous curvature, floating glass encapsulation, and subtle isolation padding to the active top navigation bar.
+            </span>
+</div>
+<button class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full bg-primary-container transition-colors focus:outline-none" id="toggle-round-tab">
+<span class="inline-block h-5 w-5 translate-x-5 transform rounded-full bg-on-primary-fixed shadow transition-transform my-0.5 ml-0.5" id="toggle-dot"></span>
+</button>
+</div>
+<!-- Geometry Selector Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm pt-space-xs">
+<!-- Option 1: Pill -->
+<button class="geo-opt flex flex-col p-space-sm rounded-lg bg-surface-container-high text-left transition-all group border border-outline-variant/20" data-radius="18" data-shape="pill">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface">Rounded Pill</span>
+<span class="material-symbols-outlined text-[16px] text-primary">radio_button_checked</span>
+</div>
+<div class="h-6 w-full bg-surface-container-lowest rounded-full flex items-center px-2">
+<div class="h-3 w-16 bg-primary/40 rounded-full"></div>
+</div>
+<span class="font-body-sm text-body-sm text-outline mt-2 group-hover:text-on-surface-variant">Radius 16-20px</span>
+</button>
+<!-- Option 2: Subtle 4px -->
+<button class="geo-opt flex flex-col p-space-sm rounded-lg bg-surface-container text-left transition-all hover:bg-surface-container-high group border border-outline-variant/20" data-radius="4" data-shape="subtle">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Subtle Soft</span>
+<span class="material-symbols-outlined text-[16px] text-outline">radio_button_unchecked</span>
+</div>
+<div class="h-6 w-full bg-surface-container-lowest rounded flex items-center px-2">
+<div class="h-3 w-16 bg-outline/30 rounded"></div>
+</div>
+<span class="font-body-sm text-body-sm text-outline mt-2 group-hover:text-on-surface-variant">Radius 4px</span>
+</button>
+<!-- Option 3: Minimalist 0px -->
+<button class="geo-opt flex flex-col p-space-sm rounded-lg bg-surface-container text-left transition-all hover:bg-surface-container-high group border border-outline-variant/20" data-radius="0" data-shape="sharp">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Sharp Minimal</span>
+<span class="material-symbols-outlined text-[16px] text-outline">radio_button_unchecked</span>
+</div>
+<div class="h-6 w-full bg-surface-container-lowest rounded-none flex items-center px-2">
+<div class="h-3 w-16 bg-outline/30 rounded-none"></div>
+</div>
+<span class="font-body-sm text-body-sm text-outline mt-2 group-hover:text-on-surface-variant">Radius 0px</span>
+</button>
+<!-- Option 4: Segmented Capsule -->
+<button class="geo-opt flex flex-col p-space-sm rounded-lg bg-surface-container text-left transition-all hover:bg-surface-container-high group border border-outline-variant/20" data-radius="12" data-shape="capsule">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Capsule Grid</span>
+<span class="material-symbols-outlined text-[16px] text-outline">radio_button_unchecked</span>
+</div>
+<div class="h-6 w-full bg-surface-container-lowest rounded-xl flex items-center px-1.5 gap-1">
+<div class="h-3 w-8 bg-outline/30 rounded-lg"></div>
+<div class="h-3 w-8 bg-outline/20 rounded-lg"></div>
+</div>
+<span class="font-body-sm text-body-sm text-outline mt-2 group-hover:text-on-surface-variant">Radius 10-12px</span>
+</button>
+</div>
+<!-- Slider Micro-controls -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-space-xs">
+<!-- Radius Slider -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm uppercase tracking-wider text-outline" for="slider-radius">Tab Radius</label>
+<span class="font-code-inline text-code-inline text-primary" id="radius-val">16px</span>
+</div>
+<input class="w-full accent-primary h-1.5 bg-surface-container-highest rounded-lg cursor-pointer" id="slider-radius" max="24" min="0" type="range" value="16"/>
+</div>
+<!-- Tab Indicator Style -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Indicator Accent</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Subtle Glow</span>
+</div>
+<div class="flex items-center bg-surface-container p-0.5 rounded gap-1">
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">Dot</button>
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">Underline</button>
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded bg-surface-container-highest text-on-surface shadow-sm">Soft Fill</button>
+</div>
+</div>
+<!-- Density -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Height / Density</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">36px (Default)</span>
+</div>
+<div class="flex items-center bg-surface-container p-0.5 rounded gap-1">
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">28px</button>
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded bg-surface-container-highest text-on-surface shadow-sm">36px</button>
+<button class="flex-1 py-1 text-center font-label-sm text-label-sm rounded text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors">42px</button>
+</div>
+</div>
+</div>
+</section>
+<!-- LIVE BUFFER & SYNTAX PREVIEWER (Real-time Token Highlighting Engine) -->
+<section class="bg-surface-container-lowest p-space-md md:p-space-lg rounded-xl flex flex-col gap-space-md shadow-2xl border border-outline-variant/20">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Interactive Live Buffer &amp; Syntax Previewer</h2>
+</div>
+<span class="font-body-sm text-body-sm text-outline">
+            Simulating <code class="font-code-inline text-code-inline text-primary">src/theme/engine.rs</code> with customized tokens &amp; real-time continuous geometry.
+          </span>
+</div>
+<!-- Dynamic Token Swatch Rail -->
+<div class="flex items-center gap-space-sm bg-surface-container-low px-space-sm py-1.5 rounded-lg overflow-x-auto border border-outline-variant/15">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#111318] border border-outline-variant/40"></span>
+<span class="font-code-inline text-code-inline text-outline text-[11px]">base</span>
+</div>
+<span class="text-outline/30">|</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#6c99bb]"></span>
+<span class="font-code-inline text-code-inline text-[#6c99bb] text-[11px]">fn/kw</span>
+</div>
+<span class="text-outline/30">|</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#a8cd89]"></span>
+<span class="font-code-inline text-code-inline text-[#a8cd89] text-[11px]">str</span>
+</div>
+<span class="text-outline/30">|</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#e5c07b]"></span>
+<span class="font-code-inline text-code-inline text-[#e5c07b] text-[11px]">type</span>
+</div>
+<span class="text-outline/30">|</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#d19a66]"></span>
+<span class="font-code-inline text-code-inline text-[#d19a66] text-[11px]">const</span>
+</div>
+<span class="text-outline/30">|</span>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#5c6370]"></span>
+<span class="font-code-inline text-code-inline text-[#5c6370] text-[11px]">cmt</span>
+</div>
+</div>
+</div>
+<!-- Simulated Editor Frame -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-2xl flex flex-col border border-outline-variant/20">
+<!-- Dynamic Live Tab Strip (reflects selected radius dynamically) -->
+<div class="h-10 bg-surface-container-low px-space-sm flex items-center gap-2 select-none overflow-x-auto border-b border-outline-variant/15" id="live-tab-bar">
+<!-- Inactive Tab -->
+<div class="live-tab px-3 py-1 text-outline hover:text-on-surface text-label-sm font-label-sm flex items-center gap-2 cursor-pointer transition-all" style="border-radius: 16px;">
+<span class="material-symbols-outlined text-[14px]">code</span>
+<span>main.rs</span>
+</div>
+<!-- Active Tab -->
+<div class="live-tab px-3.5 py-1 bg-surface-container-highest text-on-surface text-label-md font-label-md flex items-center gap-2 cursor-pointer transition-all shadow-sm border border-outline-variant/20" style="border-radius: 16px;">
+<span class="material-symbols-outlined text-[14px] text-primary">brush</span>
+<span class="text-primary font-medium">theme.rs</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="material-symbols-outlined text-[12px] text-outline hover:text-on-surface ml-1">close</span>
+</div>
+<!-- Inactive Tab -->
+<div class="live-tab px-3 py-1 text-outline hover:text-on-surface text-label-sm font-label-sm flex items-center gap-2 cursor-pointer transition-all" style="border-radius: 16px;">
+<span class="material-symbols-outlined text-[14px]">settings</span>
+<span>config.toml</span>
+</div>
+<!-- Inactive Tab -->
+<div class="live-tab hidden sm:flex px-3 py-1 text-outline hover:text-on-surface text-label-sm font-label-sm items-center gap-2 cursor-pointer transition-all" style="border-radius: 16px;">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+<span>vulkan_surface.rs</span>
+</div>
+<div class="ml-auto flex items-center gap-2 text-outline pr-1">
+<span class="material-symbols-outlined text-[15px] cursor-pointer hover:text-on-surface">csv</span>
+<span class="material-symbols-outlined text-[15px] cursor-pointer hover:text-on-surface">more_horiz</span>
+</div>
+</div>
+<!-- Code Canvas Split (Gutter + Code Stream) -->
+<div class="flex p-space-md font-code-inline text-code-inline bg-surface overflow-x-auto select-text leading-relaxed">
+<!-- Line Numbers -->
+<div class="flex flex-col text-right pr-space-md select-none text-outline/40 space-y-0.5 border-r border-outline-variant/15 mr-4">
+<span>01</span>
+<span>02</span>
+<span>03</span>
+<span>04</span>
+<span>05</span>
+<span>06</span>
+<span class="text-primary font-semibold">07</span>
+<span>08</span>
+<span>09</span>
+<span>10</span>
+<span>11</span>
+<span>12</span>
+<span>13</span>
+</div>
+<!-- Code Lines with Syntax Coloring using customizable tokens -->
+<div class="flex flex-col text-on-surface space-y-0.5 min-w-max">
+<div>
+<span class="text-[#6c99bb] font-medium">use</span> <span class="text-on-surface-variant">blur_core::geometry</span>::{<span class="text-[#e5c07b]">ContinuousPill</span>, <span class="text-[#e5c07b]">TabMesh</span>};
+</div>
+<div>
+<span class="text-[#5c6370] italic">// Furusato aesthetic: zero cognitive drag, high ocular calm</span>
+</div>
+<div>
+<span class="text-[#6c99bb] font-medium">pub struct</span> <span class="text-[#e5c07b]">ThemeRenderer</span> {
+</div>
+<div class="pl-4">
+<span class="text-on-surface">surface_corner_radius</span>: <span class="text-[#e5c07b]">f32</span>,
+</div>
+<div class="pl-4">
+<span class="text-on-surface">chromatic_attenuation</span>: <span class="text-[#e5c07b]">f32</span>,
+</div>
+<div>
+}
+</div>
+<div class="bg-surface-container-high/40 -mx-2 px-2 py-0.5 rounded border-l-2 border-primary">
+<span class="text-[#6c99bb] font-medium">impl</span> <span class="text-[#e5c07b]">ThemeRenderer</span> {
+</div>
+<div class="pl-4">
+<span class="text-[#6c99bb] font-medium">pub fn</span> <span class="text-[#6c99bb]">apply_pill_geometry</span>(&amp;<span class="text-[#6c99bb]">mut</span> <span class="text-on-surface-variant">self</span>, <span class="text-on-surface">radius</span>: <span class="text-[#e5c07b]">f32</span>) -&gt; <span class="text-[#e5c07b]">Result</span>&lt;(), <span class="text-[#e5c07b]">GpuErr</span>&gt; {
+</div>
+<div class="pl-8">
+<span class="text-on-surface-variant">self</span>.<span class="text-on-surface">surface_corner_radius</span> = <span class="text-on-surface">radius</span>.<span class="text-[#6c99bb]">clamp</span>(<span class="text-[#d19a66]">0.0</span>, <span class="text-[#d19a66]">24.0</span>);
+</div>
+<div class="pl-8">
+<span class="text-[#e5c07b]">tracing</span>::<span class="text-[#6c99bb]">debug!</span>(<span class="text-[#a8cd89]">"Contour updated: {}px"</span>, <span class="text-on-surface">radius</span>);
+</div>
+<div class="pl-8">
+<span class="text-[#6c99bb] font-medium">Ok</span>(())
+</div>
+<div class="pl-4">
+}
+</div>
+<div>
+}
+</div>
+</div>
+</div>
+<!-- Bottom Micro Statusline inside preview -->
+<div class="h-6 bg-surface-container-lowest px-space-sm flex items-center justify-between text-[11px] font-body-sm text-outline select-none border-t border-outline-variant/15">
+<div class="flex items-center gap-2">
+<span class="text-primary uppercase tracking-wider font-semibold">LIVE REPAINT</span>
+<span class="text-outline/30">|</span>
+<span class="text-on-surface-variant">engine.rs</span>
+</div>
+<div class="flex items-center gap-3">
+<span>UTF-8</span>
+<span class="text-secondary font-code-inline">Pill Contour: 16px</span>
+<span class="text-on-surface font-code-inline">Tokens: 6 active</span>
+<span>60 FPS</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<script>
+  (function initThemeStudio() {
+    const sliderRadius = document.getElementById('slider-radius');
+    const radiusVal = document.getElementById('radius-val');
+    const liveTabs = document.querySelectorAll('.live-tab');
+    const geoOptions = document.querySelectorAll('.geo-opt');
+    const toggleRoundTab = document.getElementById('toggle-round-tab');
+    const toggleDot = document.getElementById('toggle-dot');
+    
+    let isContinuousEnabled = true;
+
+    function updateRadius(px) {
+      if (!isContinuousEnabled) px = 0;
+      if (radiusVal) radiusVal.textContent = px + 'px';
+      liveTabs.forEach(tab => {
+        tab.style.borderRadius = px + 'px';
+      });
+    }
+
+    if (sliderRadius) {
+      sliderRadius.addEventListener('input', (e) => {
+        updateRadius(e.target.value);
+      });
+    }
+
+    geoOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        geoOptions.forEach(o => {
+          o.classList.remove('bg-surface-container-high');
+          o.classList.add('bg-surface-container');
+          const icon = o.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.textContent = 'radio_button_unchecked';
+            icon.classList.remove('text-primary');
+            icon.classList.add('text-outline');
+          }
+        });
+        opt.classList.remove('bg-surface-container');
+        opt.classList.add('bg-surface-container-high');
+        const icon = opt.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = 'radio_button_checked';
+          icon.classList.remove('text-outline');
+          icon.classList.add('text-primary');
+        }
+
+        const r = opt.getAttribute('data-radius') || '16';
+        if (sliderRadius) sliderRadius.value = r;
+        updateRadius(r);
+      });
+    });
+
+    if (toggleRoundTab && toggleDot) {
+      toggleRoundTab.addEventListener('click', () => {
+        isContinuousEnabled = !isContinuousEnabled;
+        if (isContinuousEnabled) {
+          toggleRoundTab.classList.remove('bg-surface-container-highest');
+          toggleRoundTab.classList.add('bg-primary-container');
+          toggleDot.classList.remove('translate-x-0');
+          toggleDot.classList.add('translate-x-5');
+          const val = sliderRadius ? sliderRadius.value : 16;
+          updateRadius(val);
+        } else {
+          toggleRoundTab.classList.remove('bg-primary-container');
+          toggleRoundTab.classList.add('bg-surface-container-highest');
+          toggleDot.classList.remove('translate-x-5');
+          toggleDot.classList.add('translate-x-0');
+          updateRadius(0);
+        }
+      });
+    }
+
+    // Accent Chips Selection
+    const accentChips = document.querySelectorAll('.accent-chip');
+    accentChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        accentChips.forEach(c => {
+          c.classList.remove('border-primary/80', 'bg-surface-container-high', 'border-2');
+          c.classList.add('bg-surface-container', 'border', 'border-outline-variant/30');
+          const icon = c.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.textContent = 'radio_button_unchecked';
+            icon.classList.remove('text-primary');
+            icon.classList.add('text-outline');
+          }
+        });
+        chip.classList.add('border-primary/80', 'bg-surface-container-high', 'border-2');
+        chip.classList.remove('bg-surface-container', 'border-outline-variant/30');
+        const icon = chip.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = 'check_circle';
+          icon.classList.remove('text-outline');
+          icon.classList.add('text-primary');
+        }
+      });
+    });
+
+    // Export buttons feedback
+    const btnExportToml = document.getElementById('btn-export-toml');
+    if (btnExportToml) {
+      btnExportToml.addEventListener('click', () => {
+        const prev = btnExportToml.innerHTML;
+        btnExportToml.innerHTML = '<span class="material-symbols-outlined text-[15px]">check</span><span>Exported to theme.toml</span>';
+        setTimeout(() => { btnExportToml.innerHTML = prev; }, 2000);
+      });
+    }
+
+    const btnSaveCustomPreset = document.getElementById('btn-save-custom-preset');
+    if (btnSaveCustomPreset) {
+      btnSaveCustomPreset.addEventListener('click', () => {
+        const prev = btnSaveCustomPreset.innerHTML;
+        btnSaveCustomPreset.innerHTML = '<span class="material-symbols-outlined text-[15px] text-secondary">check</span><span>Preset Saved</span>';
+        setTimeout(() => { btnSaveCustomPreset.innerHTML = prev; }, 2000);
+      });
+    }
+
+    const btnExport = document.getElementById('btn-export');
+    if (btnExport) {
+      btnExport.addEventListener('click', () => {
+        const originalText = btnExport.innerHTML;
+        btnExport.innerHTML = '<span class="material-symbols-outlined text-[15px] text-secondary">check</span><span>Exported to ~/.config</span>';
+        setTimeout(() => {
+          btnExport.innerHTML = originalText;
+        }, 1800);
+      });
+    }
+  })();
+</script></main><footer class="fixed bottom-0 left-0 right-0 h-8 bg-surface-container-lowest/90 backdrop-blur-xl z-40 px-space-md flex items-center justify-between text-outline font-body-sm text-body-sm shadow-[0_-1px_4px_rgba(0,0,0,0.3)] select-none border-t border-outline-variant/15"><div class="flex items-center gap-space-md"><span class="font-label-sm text-label-sm tracking-wider uppercase text-outline">NORMAL</span><span class="text-outline/30">|</span><span class="hover:text-on-surface-variant transition-colors cursor-pointer">main</span><span class="text-outline/30">|</span><span class="text-on-surface-variant">utf-8</span></div><div class="flex items-center gap-space-md"><span class="hover:text-on-surface-variant transition-colors cursor-pointer hidden sm:inline">rustc 1.78</span><span class="text-outline/30 hidden sm:inline">|</span><span class="text-on-surface-variant font-code-inline text-code-inline">42:18</span><span class="text-outline/30">|</span><span class="text-on-surface-variant">spaces: 4</span><span class="text-outline/30">|</span><span class="text-secondary font-label-sm text-label-sm">clean</span></div></footer></body></html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container-high": "#282a2f", "primary-container": "#6c99bb", "on-tertiary": "#412d00", "surface-container": "#1e2025", "on-surface": "#e2e2e9", "outline-variant": "#41474d", "inverse-on-surface": "#2e3036", "secondary-container": "#1d4f46", "on-secondary-fixed": "#00201b", "surface-variant": "#33353a", "on-primary-container": "#003049", "on-primary": "#00344e", "primary": "#9eccf0", "on-secondary-fixed-variant": "#1d4f46", "on-background": "#e2e2e9", "tertiary-container": "#b28f4a", "tertiary": "#e9c176", "surface-tint": "#9eccf0", "on-primary-fixed-variant": "#184b69", "on-primary-fixed": "#001e2f", "on-secondary-container": "#8dbfb4", "on-error": "#690005", "primary-fixed": "#c9e6ff", "error-container": "#93000a", "outline": "#8b9198", "surface-dim": "#111318", "on-surface-variant": "#c1c7ce", "background": "#111318", "on-tertiary-fixed": "#261900", "on-tertiary-container": "#3c2a00", "surface-bright": "#37393f", "secondary-fixed-dim": "#9ed0c5", "on-secondary": "#003730", "error": "#ffb4ab", "secondary-fixed": "#baede1", "on-error-container": "#ffdad6", "tertiary-fixed-dim": "#e9c176", "inverse-primary": "#346382", "inverse-surface": "#e2e2e9", "primary-fixed-dim": "#9eccf0", "secondary": "#9ed0c5", "surface-container-highest": "#33353a", "tertiary-fixed": "#ffdea5", "surface": "#111318", "surface-container-low": "#1a1b21", "on-tertiary-fixed-variant": "#5d4201", "surface-container-lowest": "#0c0e13" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-xl": "2.5rem", "space-sm": "0.5rem", "gutter-mobile": "0.75rem", "margin": "2rem", "space-md": "0.875rem", "margin-mobile": "1rem", "gutter": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem" }, "fontFamily": { "body-lg": ["JetBrains Mono"], "body-md": ["JetBrains Mono"], "label-sm": ["Geist"], "code-inline": ["JetBrains Mono"], "label-md": ["Geist"], "headline-md": ["Geist"], "headline-lg": ["Geist"], "headline-sm": ["Geist"], "body-sm": ["JetBrains Mono"] }, "fontSize": { "body-lg": ["15px", { "lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400" }], "body-md": ["13.5px", { "lineHeight": "23px", "letterSpacing": "0em", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "400" }], "code-inline": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "450" }], "headline-md": ["22px", { "lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "400" }], "headline-lg": ["30px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }], "body-sm": ["12px", { "lineHeight": "19px", "letterSpacing": "0.01em", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-surface-container-highest selection:text-primary"><header class="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-12 w-full px-space-md flex items-center justify-between"><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs"><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest transition-colors hover:bg-outline-variant"></span></div><span class="font-label-sm text-label-sm tracking-widest uppercase text-outline px-space-xs">blur</span><div class="hidden sm:flex items-center text-outline text-label-sm font-label-sm"><span class="hover:text-on-surface-variant transition-colors">src</span><span class="px-space-xs text-outline/40">/</span><span class="text-on-surface-variant font-code-inline text-code-inline">main.rs</span></div></div><nav class="flex items-center gap-space-xs bg-surface-container-low p-space-xs rounded" data-active-classes="bg-surface-container-high text-on-surface rounded font-label-md"><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="editor" href="#">Editor</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="git" href="#">Version Control</a><a aria-current="page" class="px-space-sm py-space-xs transition-all bg-surface-container-high text-on-surface rounded font-label-md" data-path="lsp" href="#">Protocols & LSP</a><a class="font-label-md text-label-md px-space-sm py-space-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" data-path="utilities" href="#">Utilities</a></nav><div class="flex items-center gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-space-xs rounded text-outline hover:text-on-surface-variant transition-colors cursor-pointer"><span class="font-body-sm text-body-sm">⌘K</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-12 pb-8 flex-1 bg-surface"><div class="flex flex-col w-full">
+<div class="w-full max-w-7xl mx-auto px-space-md sm:px-space-xl py-space-lg">
+<!-- Top Architectural Philosophy Banner -->
+<div class="relative w-full mb-space-xl bg-surface-container-lowest rounded-xl p-space-lg shadow-sm overflow-hidden">
+<div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+<div class="flex flex-col md:flex-row md:items-baseline justify-between gap-space-md relative z-10">
+<div class="space-y-space-xs max-w-2xl">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Subsystem Architecture</span>
+<span class="text-outline/40">/</span>
+<span class="font-label-sm text-label-sm text-primary">LSP 3.17 Client</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface font-light tracking-tight">Language Daemons</h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Blur implements the protocol once. Language servers provide language-specific intelligence over raw stdio pipes. Zero telemetry, zero marketplace layers, purely determinative execution.
+          </p>
+</div>
+<div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-space-sm rounded">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">4 Daemons Active</span>
+<span class="text-outline/30 px-1">·</span>
+<span class="font-code-inline text-code-inline text-outline">stdio | pid tree</span>
+</div>
+</div>
+</div>
+<!-- Main Workspace Split Pane -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Daemon Manifest List (4 cols) -->
+<div class="lg:col-span-4 flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs py-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Registered Daemons</span>
+<span class="font-code-inline text-code-inline text-outline text-label-sm">4 / 4 OK</span>
+</div>
+<!-- Server Item 1 (Selected: rust-analyzer) -->
+<button class="daemon-card w-full text-left p-space-md rounded bg-surface-container-high text-on-surface shadow-sm transition-all duration-150 relative group" id="daemon-rust-analyzer" onclick="selectServer('rust-analyzer')" type="button">
+<div class="absolute left-0 top-2 bottom-2 w-0.5 bg-primary rounded-r"></div>
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">rust-analyzer</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 bg-surface-container-highest text-primary rounded">v0.3.1942</span>
+</div>
+<p class="font-code-inline text-code-inline text-outline text-label-sm mt-0.5">/opt/homebrew/bin/rust-analyzer</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+</div>
+<div class="mt-space-md flex items-center justify-between font-code-inline text-code-inline text-body-sm">
+<span class="text-secondary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              stdio: 34ms ping
+            </span>
+<span class="text-outline">rs, toml</span>
+</div>
+</button>
+<!-- Server Item 2: gopls -->
+<button class="daemon-card w-full text-left p-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface shadow-sm transition-all duration-150 relative group" id="daemon-gopls" onclick="selectServer('gopls')" type="button">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">gopls</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 bg-surface-container-highest text-outline rounded">v0.15.2</span>
+</div>
+<p class="font-code-inline text-code-inline text-outline text-label-sm mt-0.5">~/go/bin/gopls</p>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary/80 mt-2"></span>
+</div>
+<div class="mt-space-md flex items-center justify-between font-code-inline text-code-inline text-body-sm">
+<span class="text-outline">stdio: alive</span>
+<span class="text-outline">go, gomod</span>
+</div>
+</button>
+<!-- Server Item 3: pyright -->
+<button class="daemon-card w-full text-left p-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface shadow-sm transition-all duration-150 relative group" id="daemon-pyright" onclick="selectServer('pyright')" type="button">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">pyright-langserver</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 bg-surface-container-highest text-outline rounded">v1.1.350</span>
+</div>
+<p class="font-code-inline text-code-inline text-outline text-label-sm mt-0.5">~/.nvm/versions/node/bin/pyright</p>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary/80 mt-2"></span>
+</div>
+<div class="mt-space-md flex items-center justify-between font-code-inline text-code-inline text-body-sm">
+<span class="text-outline">node ipc: idle</span>
+<span class="text-outline">py, pyi</span>
+</div>
+</button>
+<!-- Server Item 4: clangd -->
+<button class="daemon-card w-full text-left p-space-md rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface shadow-sm transition-all duration-150 relative group" id="daemon-clangd" onclick="selectServer('clangd')" type="button">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">clangd</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 bg-surface-container-highest text-outline rounded">18.1.3</span>
+</div>
+<p class="font-code-inline text-code-inline text-outline text-label-sm mt-0.5">/usr/bin/clangd</p>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary/80 mt-2"></span>
+</div>
+<div class="mt-space-md flex items-center justify-between font-code-inline text-code-inline text-body-sm">
+<span class="text-outline">stdio: idle</span>
+<span class="text-outline">c, cpp, h</span>
+</div>
+</button>
+<!-- Low Key Addition Hook -->
+<div class="pt-space-sm">
+<button class="w-full py-space-sm px-space-md bg-surface-container-lowest hover:bg-surface-container-low text-outline hover:text-on-surface rounded font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Declare custom daemon command...</span>
+</button>
+</div>
+</div>
+<!-- Right Column: Detail, Capabilities, Config & Protocol Stream (8 cols) -->
+<div class="lg:col-span-8 flex flex-col space-y-space-md">
+<!-- Active Server Summary Box -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+<div>
+<div class="flex items-center gap-space-sm">
+<span class="font-headline-md text-headline-md text-on-surface" id="selected-title">rust-analyzer</span>
+<span class="font-code-inline text-code-inline text-tertiary px-space-xs py-0.5 bg-surface-container rounded text-label-sm">rustc 1.78.0-nightly</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">Autonomous background daemon spawned by Blur Unix pipe runner.</p>
+</div>
+<!-- Tranquil Actions -->
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface rounded font-label-md text-label-md flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">refresh</span>
+                Restart Daemon
+              </button>
+<button class="px-space-sm py-space-xs bg-surface-container hover:bg-surface-container-high text-on-surface rounded font-label-md text-label-md flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">terminal</span>
+                Stdio Pipe Logs
+              </button>
+</div>
+</div>
+<!-- Quiet Connection Diagnostics Bar -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-sm bg-surface-container-lowest p-space-md rounded">
+<div>
+<span class="block font-label-sm text-label-sm text-outline uppercase tracking-wider">Transport</span>
+<span class="font-code-inline text-code-inline text-on-surface text-body-sm flex items-center gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                Stdio Duplex
+              </span>
+</div>
+<div>
+<span class="block font-label-sm text-label-sm text-outline uppercase tracking-wider">PID & Memory</span>
+<span class="font-code-inline text-code-inline text-on-surface text-body-sm mt-0.5">48912 · 246 MB</span>
+</div>
+<div>
+<span class="block font-label-sm text-label-sm text-outline uppercase tracking-wider">Handshake Roundtrip</span>
+<span class="font-code-inline text-code-inline text-secondary text-body-sm mt-0.5">1.2ms (Zero latency)</span>
+</div>
+<div>
+<span class="block font-label-sm text-label-sm text-outline uppercase tracking-wider">Client Semantic Model</span>
+<span class="font-code-inline text-code-inline text-on-surface text-body-sm mt-0.5">UTF-16 Positions</span>
+</div>
+</div>
+<!-- Server Capabilities Manifest -->
+<div>
+<span class="block font-label-sm text-label-sm uppercase tracking-widest text-outline mb-space-xs">Negotiated Client Capabilities</span>
+<div class="flex flex-wrap gap-space-xs font-label-md text-label-md">
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> textDocument/hover
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> textDocument/completion (Snippets)
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> textDocument/inlayHint
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> textDocument/publishDiagnostics
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> workspace/symbol
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-on-surface flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-primary"></span> textDocument/codeAction
+              </span>
+<span class="px-2.5 py-1 bg-surface-container rounded text-outline flex items-center gap-1.5">
+<span class="w-1 h-1 rounded-full bg-outline"></span> semanticTokens (Disabled)
+              </span>
+</div>
+</div>
+</div>
+<!-- Protocol Payload Visualizer (JSON-RPC Live Inspector) -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm space-y-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-outline text-[16px]">swap_horiz</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Transparent Protocol Wire (JSON-RPC 2.0)</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-outline">Latest Frame: textDocument/hover</span>
+<span class="font-code-inline text-code-inline text-tertiary text-label-sm">#142</span>
+</div>
+</div>
+<!-- Formatted Payload Display -->
+<div class="bg-surface-container-lowest rounded p-space-md font-code-inline text-code-inline text-body-sm overflow-x-auto text-on-surface">
+<div class="text-outline text-label-sm mb-space-xs select-none">// Client request -> Server response</div>
+<div class="space-y-1">
+<div><span class="text-outline">{</span></div>
+<div class="pl-4"><span class="text-primary">"jsonrpc"</span><span class="text-outline">:</span> <span class="text-secondary">"2.0"</span><span class="text-outline">,</span></div>
+<div class="pl-4"><span class="text-primary">"id"</span><span class="text-outline">:</span> <span class="text-tertiary">142</span><span class="text-outline">,</span></div>
+<div class="pl-4"><span class="text-primary">"result"</span><span class="text-outline">:</span> <span class="text-outline">{</span></div>
+<div class="pl-8"><span class="text-primary">"contents"</span><span class="text-outline">:</span> <span class="text-outline">{</span></div>
+<div class="pl-12"><span class="text-primary">"kind"</span><span class="text-outline">:</span> <span class="text-secondary">"markdown"</span><span class="text-outline">,</span></div>
+<div class="pl-12"><span class="text-primary">"value"</span><span class="text-outline">:</span> <span class="text-secondary">"rust\npub fn parse_frame(&self) -> Result<Frame, Error>\n\n\nParses an incoming unbuffered transport packet from stdio."</span></div>
+<div class="pl-8"><span class="text-outline">},</span></div>
+<div class="pl-8"><span class="text-primary">"range"</span><span class="text-outline">:</span> <span class="text-outline">{</span></div>
+<div class="pl-12"><span class="text-primary">"start"</span><span class="text-outline">:</span> <span class="text-outline">{</span> <span class="text-primary">"line"</span><span class="text-outline">:</span> <span class="text-tertiary">42</span><span class="text-outline">,</span> <span class="text-primary">"character"</span><span class="text-outline">:</span> <span class="text-tertiary">7</span> <span class="text-outline">},</span></div>
+<div class="pl-12"><span class="text-primary">"end"</span><span class="text-outline">:</span> <span class="text-outline">{</span> <span class="text-primary">"line"</span><span class="text-outline">:</span> <span class="text-tertiary">42</span><span class="text-outline">,</span> <span class="text-primary">"character"</span><span class="text-outline">:</span> <span class="text-tertiary">18</span> <span class="text-outline">}</span></div>
+<div class="pl-8"><span class="text-outline">}</span></div>
+<div class="pl-4"><span class="text-outline">}</span></div>
+<div><span class="text-outline">}</span></div>
+</div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm pt-space-xs">
+<span>Buffer size: 418 bytes</span>
+<span class="text-secondary">Parsed & applied to text buffer instantly</span>
+</div>
+</div>
+<!-- In-Place Configuration Editor (No wizards) -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-headline-sm text-headline-sm text-on-surface">Daemon Initialization Configuration</span>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">Stored as pure TOML in workspace root (<span class="font-code-inline text-on-surface-variant">.blur/lsp.toml</span>).</p>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="font-label-sm text-label-sm text-secondary bg-surface-container px-2 py-0.5 rounded">Synced</span>
+<button class="px-space-sm py-space-xs bg-primary text-on-primary rounded font-label-md text-label-md hover:bg-primary/90 transition-colors" type="button">
+                Apply & Reload
+              </button>
+</div>
+</div>
+<div class="relative bg-surface-container-lowest rounded p-space-md font-code-inline text-code-inline text-body-sm text-on-surface">
+<textarea class="w-full bg-transparent resize-y outline-none text-on-surface font-code-inline text-code-inline leading-relaxed selection:bg-surface-container-highest selection:text-primary" rows="9" spellcheck="false">[servers.rust-analyzer]
+command = "rust-analyzer"
+args = ["--log-file", "/tmp/ra.log"]
+filetypes = ["rust", "toml"]
+
+[servers.rust-analyzer.initialization_options]
+checkOnSave = { command = "clippy" }
+inlayHints = { typeHints = true, parameterHints = true, chainingHints = true }
+procMacro = { enable = true }
+cargo = { allFeatures = true, loadOutDirsFromCheck = true }</textarea>
+</div>
+<div class="flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>Direct stdin/stdout IPC configuration</span>
+<span>Zero GUI intermediaries</span>
+</div>
+</div>
+<!-- Quiet Visual Data: Latency & Handshake Telemetry (Inline SVG Chart) -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-outline">Transport Response Latency (Last 60 Requests)</span>
+<span class="font-code-inline text-code-inline text-secondary text-label-sm">p95: 1.8ms</span>
+</div>
+<!-- Ambient Sparkline -->
+<div class="w-full h-16 relative flex items-end pt-2">
+<svg class="w-full h-12 text-primary/40 overflow-visible" preserveaspectratio="none" viewbox="0 0 400 40">
+<path d="M0,35 Q20,34 40,30 T80,28 T120,33 T160,25 T200,28 T240,22 T280,31 T320,18 T360,26 T400,24" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+<path d="M0,35 Q20,34 40,30 T80,28 T120,33 T160,25 T200,28 T240,22 T280,31 T320,18 T360,26 T400,24 L400,40 L0,40 Z" fill="currentColor" fill-opacity="0.08"></path>
+<!-- Highlight point -->
+<circle class="text-tertiary" cx="320" cy="18" fill="currentColor" r="3"></circle>
+</svg>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-outline pt-1">
+<span>-60 reqs</span>
+<span>Hover peak (18ms)</span>
+<span>Now (stdio quiescent)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quiet Philosophy Footer Ribbon -->
+<div class="mt-space-xl pt-space-md flex flex-col sm:flex-row items-center justify-between text-outline font-label-sm text-label-sm gap-space-sm">
+<div class="flex items-center gap-space-md">
+<span>Protocol standard: LSP 3.17 Specification</span>
+<span class="text-outline/30">|</span>
+<span>Daemon supervisor: SIGINT graceful termination</span>
+</div>
+<div>
+<span class="text-outline/60">Config path: <span class="font-code-inline text-on-surface-variant">~/.config/blur/lsp.toml</span></span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function selectServer(serverKey) {
+    // Quietly update visual active state on side menu
+    const buttons = document.querySelectorAll('.daemon-card');
+    buttons.forEach(btn => {
+      btn.classList.remove('bg-surface-container-high', 'text-on-surface');
+      btn.classList.add('bg-surface-container-low', 'text-on-surface-variant');
+      const pip = btn.querySelector('.bg-primary.w-0\\.5');
+      if (pip) pip.remove();
+    });
+
+    const activeBtn = document.getElementById('daemon-' + serverKey);
+    if (activeBtn) {
+      activeBtn.classList.remove('bg-surface-container-low', 'text-on-surface-variant');
+      activeBtn.classList.add('bg-surface-container-high', 'text-on-surface');
+      
+      const pip = document.createElement('div');
+      pip.className = 'absolute left-0 top-2 bottom-2 w-0.5 bg-primary rounded-r';
+      activeBtn.prepend(pip);
+    }
+
+    const titleEl = document.getElementById('selected-title');
+    if (titleEl) {
+      titleEl.textContent = serverKey;
+    }
+  }
+</script></main><footer class="fixed bottom-0 left-0 right-0 h-8 bg-surface-container-lowest/90 backdrop-blur-xl z-40 px-space-md flex items-center justify-between text-outline font-body-sm text-body-sm shadow-[0_-1px_4px_rgba(0,0,0,0.3)]"><div class="flex items-center gap-space-md"><span class="font-label-sm text-label-sm tracking-wider uppercase text-outline">NORMAL</span><span class="text-outline/30">|</span><span class="hover:text-on-surface-variant transition-colors cursor-pointer">main</span><span class="text-outline/30">|</span><span class="text-on-surface-variant">utf-8</span></div><div class="flex items-center gap-space-md"><span class="hover:text-on-surface-variant transition-colors cursor-pointer">rustc 1.78</span><span class="text-outline/30">|</span><span class="text-on-surface-variant font-code-inline text-code-inline">42:18</span><span class="text-outline/30">|</span><span>spaces: 4</span></div></footer></body></html>

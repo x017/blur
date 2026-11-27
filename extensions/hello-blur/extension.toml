@@ -1,0 +1,7 @@
+id = "hello-blur"
+name = "Hello Blur"
+version = "0.1.0"
+description = "Sample Blur extension demonstrating commands, keybindings, panels, and events."
+author = "Blur Team"
+main = "init.lua"
+permissions = ["commands", "keymap", "ui", "workspace.read"]

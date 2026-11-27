@@ -1,0 +1,104 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+default-members = ["crates/blur"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# Internal crates
+blur_core = { path = "crates/blur_core" }
+blur_buffer = { path = "crates/blur_buffer" }
+blur_syntax = { path = "crates/blur_syntax" }
+blur_lsp = { path = "crates/blur_lsp" }
+blur_dap = { path = "crates/blur_dap" }
+blur_git = { path = "crates/blur_git" }
+blur_terminal = { path = "crates/blur_terminal" }
+blur_workspace = { path = "crates/blur_workspace" }
+blur_extensions = { path = "crates/blur_extensions" }
+blur_utils = { path = "crates/blur_utils" }
+blur_viewers = { path = "crates/blur_viewers" }
+blur_theme = { path = "crates/blur_theme" }
+blur_ui = { path = "crates/blur_ui" }
+blur_editor = { path = "crates/blur_editor" }
+
+# UI
+gpui = "0.2.2"
+
+# Runtime / foundation
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "io-util", "sync", "time", "fs"] }
+futures = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+parking_lot = "0.12"
+dirs = "5"
+smallvec = "1"
+
+# Editor
+ropey = "1.6"
+unicode-segmentation = "1.12"
+tree-sitter = "0.25"
+tree-sitter-rust = "0.24"
+tree-sitter-python = "0.23"
+tree-sitter-go = "0.23"
+tree-sitter-javascript = "0.23"
+tree-sitter-typescript = "0.23"
+tree-sitter-c = "0.24"
+tree-sitter-cpp = "0.23"
+tree-sitter-json = "0.24"
+tree-sitter-bash = "0.23"
+tree-sitter-lua = "0.2"
+tree-sitter-toml-ng = "0.7"
+tree-sitter-md = "0.5"
+tree-sitter-html = "0.23"
+tree-sitter-css = "0.23"
+tree-sitter-yaml = "0.7"
+
+# Protocols
+lsp-types = "0.97"
+url = "2"
+
+# Git / terminal / workspace
+git2 = { version = "0.20", default-features = false }
+portable-pty = "0.9"
+alacritty_terminal = "0.25"
+notify = "7"
+ignore = "0.4"
+regex = "1"
+nucleo-matcher = "0.3"
+walkdir = "2"
+
+# Extensions
+mlua = { version = "0.10", features = ["lua54", "vendored", "serialize", "send"] }
+
+# Utilities / viewers
+ureq = { version = "2", features = ["json"] }
+base64 = "0.22"
+uuid = { version = "1", features = ["v4", "v7"] }
+chrono = "0.4"
+similar = "2"
+pulldown-cmark = "0.12"
+serde_yaml = "0.9"
+csv = "1"
+
+[profile.dev]
+opt-level = 1
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[patch.crates-io]
+xattr = { path = "patches/xattr" }
