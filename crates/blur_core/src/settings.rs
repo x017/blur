@@ -265,6 +265,9 @@ pub struct UiSettings {
     pub top_bar_actions: bool,
     /// Show the palette summoner + theme switcher buttons in the header bar.
     pub top_bar_quick_actions: bool,
+    /// Corner radius (px) applied to the header nav pills / tab section.
+    /// Driven live from the Theme Studio geometry cards.
+    pub tab_radius: f32,
 }
 
 impl Default for UiSettings {
@@ -283,6 +286,7 @@ impl Default for UiSettings {
             top_bar_stats: true,
             top_bar_actions: true,
             top_bar_quick_actions: true,
+            tab_radius: 8.0,
         }
     }
 }

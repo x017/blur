@@ -11,7 +11,10 @@ use blur_theme::Theme;
 use blur_ui::{
     badge, button, kbd, section_label, BadgeTone, ButtonVariant, TextInput, TextInputEvent,
 };
-use gpui::{div, prelude::*, px, Context, Entity, EventEmitter, FontWeight, MouseButton, Window};
+use gpui::{
+    div, prelude::*, px, Context, Entity, EventEmitter, FontWeight, MouseButton, ScrollDelta,
+    ScrollHandle, ScrollWheelEvent, Window,
+};
 
 #[derive(Debug, Clone)]
 pub enum GitViewEvent {
@@ -118,6 +121,9 @@ pub struct GitView {
     modal: GitModal,
     selected_commit_idx: usize,
     conflict_resolution: &'static str,
+    /// Wheel-scroll handles for the commit timeline + the diff pane.
+    timeline_handle: ScrollHandle,
+    diff_handle: ScrollHandle,
 }
 
 impl EventEmitter<GitViewEvent> for GitView {}
@@ -155,6 +161,8 @@ impl GitView {
             modal: GitModal::None,
             selected_commit_idx: 0,
             conflict_resolution: "ours",
+            timeline_handle: ScrollHandle::new(),
+            diff_handle: ScrollHandle::new(),
         };
         view.refresh(cx);
         view
@@ -534,6 +542,20 @@ impl Render for GitView {
                                         div()
                                             .flex_1()
                                             .overflow_hidden()
+                                            .id("git-timeline-scroll")
+                                            .track_scroll(&self.timeline_handle)
+                                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                                let dy = match event.delta {
+                                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                                };
+                                                let cur = this.timeline_handle.offset();
+                                                this.timeline_handle.set_offset(gpui::Point {
+                                                    x: cur.x,
+                                                    y: cur.y + px(dy),
+                                                });
+                                                cx.notify();
+                                            }))
                                             .flex()
                                             .flex_col()
                                             .gap(px(2.0))
@@ -761,6 +783,20 @@ impl Render for GitView {
                                         div()
                                             .flex_1()
                                             .overflow_hidden()
+                                            .id("git-diff-scroll")
+                                            .track_scroll(&self.diff_handle)
+                                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                                let dy = match event.delta {
+                                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                                };
+                                                let cur = this.diff_handle.offset();
+                                                this.diff_handle.set_offset(gpui::Point {
+                                                    x: cur.x,
+                                                    y: cur.y + px(dy),
+                                                });
+                                                cx.notify();
+                                            }))
                                             .font_family(theme.mono_font.clone())
                                             .flex()
                                             .flex_col()

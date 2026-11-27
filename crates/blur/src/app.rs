@@ -29,7 +29,7 @@ use blur_ui::{
 use blur_workspace::{list_dir, ListOptions};
 use gpui::{
     div, prelude::*, px, Context, Entity, FocusHandle, Focusable, FontWeight, KeyDownEvent,
-    MouseButton, Window,
+    MouseButton, ScrollDelta, ScrollHandle, ScrollWheelEvent, Window,
 };
 
 use crate::views::file_finder::{FileFinderEvent, FileFinderView, FinderMode};
@@ -106,6 +106,8 @@ pub struct AppShell {
     theme_studio_view: Entity<ThemeStudioView>,
     settings_view: Entity<SettingsView>,
     terminal_view: Option<Entity<TerminalView>>,
+    /// Wheel-scroll handle for the sidebar directory tree.
+    tree_handle: ScrollHandle,
 
     // Git summary for status bar
     git_head: HeadInfo,
@@ -240,6 +242,12 @@ impl AppShell {
             ThemeStudioEvent::Notification(msg) => {
                 this.push_notification(msg.clone(), NotificationLevel::Success, cx);
             }
+            ThemeStudioEvent::TabRadius(radius) => {
+                let _ = this
+                    .config
+                    .set_user_value("ui.tab_radius", toml::Value::Float(*radius as f64));
+                cx.notify();
+            }
         })
         .detach();
         let settings_view = cx.new(|cx| SettingsView::new(&config, ext_names, cx));
@@ -373,6 +381,7 @@ impl AppShell {
             theme_studio_view,
             settings_view,
             terminal_view: None,
+            tree_handle: ScrollHandle::new(),
             git_head,
             git_changes,
             overlay: OverlayMode::None,
@@ -1070,6 +1079,14 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
                 "editor.navigation_mode",
                 toml::Value::String(nav_mode),
             ),
+            (
+                "editor.font_family",
+                toml::Value::String(p.font_family.clone()),
+            ),
+            (
+                "ui.ui_font_family",
+                toml::Value::String(p.ui_font_family.clone()),
+            ),
             ("ui.nav_tabs", nav_tabs),
             (
                 "ui.top_bar_breadcrumb",
@@ -1300,7 +1317,11 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
 
     fn toggle_terminal(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.terminal_visible = !self.terminal_visible;
-        if self.terminal_visible && self.terminal_view.is_none() {
+        if !self.terminal_visible {
+            // Closing (via toggle or shortcut) releases the PTY so the next
+            // open starts a clean shell instead of showing the old buffer.
+            self.terminal_view = None;
+        } else if self.terminal_view.is_none() {
             let root = self.workspace_root.clone();
             let tv = cx.new(|cx| TerminalView::new(root, cx));
             tv.read(cx).focus(window);
@@ -1980,12 +2001,12 @@ impl Render for AppShell {
                         div()
                             .w_full()
                             .px(px(40.0))
-                            .pt(px(18.0))
-                            .pb(px(10.0))
+                            .pt(theme.scaled(18.0))
+                            .pb(theme.scaled(10.0))
                             .flex()
                             .items_center()
                             .justify_between()
-                            .gap(px(16.0))
+                            .gap(theme.scaled(16.0))
                             // Left: Breadcrumb ribbon (customizable)
                             .when(ui_cfg.top_bar_breadcrumb, |d| {
                                 d.child(
@@ -2032,10 +2053,10 @@ impl Render for AppShell {
                                 d.child(
                                     div()
                                         .id("ed-center-search")
-                                        .w(px(320.0))
-                                        .h(px(32.0))
-                                        .px(px(10.0))
-                                        .rounded(px(4.0))
+                                        .w(theme.scaled(320.0))
+                                        .h(theme.scaled(32.0))
+                                        .px(theme.scaled(10.0))
+                                        .rounded(px(ui_cfg.tab_radius))
                                         .bg(theme.surface_panel)
                                         .hover(|s| s.bg(theme.surface_elevated))
                                         .cursor_pointer()
@@ -2463,6 +2484,10 @@ impl Render for AppShell {
             .size_full()
             .bg(theme.surface)
             .text_color(theme.text)
+            // Interface typeface from Settings → Typography (ui.ui_font_family).
+            .when(!ui_cfg.ui_font_family.trim().is_empty(), |d| {
+                d.font_family(ui_cfg.ui_font_family.trim().to_string())
+            })
             .track_focus(&self.focus_handle)
             .on_key_down(cx.listener(Self::on_key_down))
             .flex()
@@ -2473,8 +2498,11 @@ impl Render for AppShell {
                 div()
                     .w_full()
                     .h(theme.scaled(48.0))
-                    .px(px(14.0))
+                    .px(theme.scaled(14.0))
                     .bg(theme.canvas)
+                    // JetBrains Mono throughout the chrome (BLUR mark, nav pills,
+                    // breadcrumb, quick actions) — matches the Stitch design.
+                    .font_family(theme.mono_font.clone())
                     .flex()
                     .items_center()
                     .justify_between()
@@ -2519,19 +2547,19 @@ impl Render for AppShell {
                         div()
                             .flex()
                             .items_center()
-                            .gap(px(4.0))
-                            .p(px(4.0))
-                            .rounded(px(4.0))
+                            .gap(theme.scaled(4.0))
+                            .p(theme.scaled(4.0))
+                            .rounded(px(ui_cfg.tab_radius + 2.0))
                             .bg(theme.surface_panel)
                             .children(nav_tabs.into_iter().enumerate().map(|(i, (m, label, _hint))| {
                                 let active = self.mode == m;
                                 div()
                                     .id(("nav-mode", i))
-                                    .px(px(10.0))
-                                    .py(px(4.0))
-                                    .rounded(px(3.0))
+                                    .px(theme.scaled(10.0))
+                                    .py(theme.scaled(4.0))
+                                    .rounded(px(ui_cfg.tab_radius))
                                     .bg(if active {
-                                        theme.surface_hover
+                                        Theme::with_alpha(theme.accent, 0.16)
                                     } else {
                                         gpui::transparent_black()
                                     })
@@ -2571,9 +2599,9 @@ impl Render for AppShell {
                             .child(
                                 div()
                                     .id("hdr-palette")
-                                    .px(px(9.0))
-                                    .py(px(4.0))
-                                    .rounded(px(4.0))
+                                    .px(theme.scaled(9.0))
+                                    .py(theme.scaled(4.0))
+                                    .rounded(px(ui_cfg.tab_radius))
                                     .bg(theme.surface_panel)
                                     .hover(|s| s.bg(theme.surface_elevated))
                                     .cursor_pointer()
@@ -2735,7 +2763,20 @@ impl Render for AppShell {
                                                 .id("sidebar-tree-scroll")
                                                 .flex_1()
                                                 .min_h_0()
-                                                .overflow_y_scroll()
+                                                .overflow_hidden()
+                                                .track_scroll(&self.tree_handle)
+                                                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                                    let dy = match event.delta {
+                                                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                                    };
+                                                    let cur = this.tree_handle.offset();
+                                                    this.tree_handle.set_offset(gpui::Point {
+                                                        x: cur.x,
+                                                        y: cur.y + px(dy),
+                                                    });
+                                                    cx.notify();
+                                                }))
                                                 .flex()
                                                 .flex_col()
                                                 .gap(px(2.0))
@@ -2801,16 +2842,24 @@ impl Render for AppShell {
                     .child(
                         div()
                             .flex_1()
+                            .min_h_0()
                             .h_full()
                             .flex()
                             .flex_col()
                             .overflow_hidden()
-                            .child(div().flex_1().w_full().overflow_hidden().child(center_view))
+                            .child(
+                                div()
+                                    .flex_1()
+                                    .min_h_0()
+                                    .w_full()
+                                    .overflow_hidden()
+                                    .child(center_view),
+                            )
                             .when(self.terminal_visible, |d| {
                                 d.child(
                                     div()
                                         .w_full()
-                                        .h(px(230.0))
+                                        .h(theme.scaled(230.0))
                                         .bg(theme.canvas)
                                         .border_t_1()
                                         .border_color(theme.border_strong)
@@ -2819,8 +2868,8 @@ impl Render for AppShell {
                                         .child(
                                             div()
                                                 .w_full()
-                                                .h(px(28.0))
-                                                .px(px(14.0))
+                                                .h(theme.scaled(28.0))
+                                                .px(theme.scaled(14.0))
                                                 .bg(theme.surface_panel)
                                                 .flex()
                                                 .items_center()
@@ -2834,7 +2883,10 @@ impl Render for AppShell {
                                                         &theme,
                                                     )
                                                     .on_click(cx.listener(|this, _, _, cx| {
+                                                        // Drop the session on close: reopening must
+                                                        // spawn a fresh PTY, not resurrect a dead one.
                                                         this.terminal_visible = false;
+                                                        this.terminal_view = None;
                                                         cx.notify();
                                                     })),
                                                 ),
@@ -2850,8 +2902,8 @@ impl Render for AppShell {
             .child(
                 div()
                     .w_full()
-                    .h(px(32.0))
-                    .px(px(16.0))
+                    .h(theme.scaled(32.0))
+                    .px(theme.scaled(16.0))
                     .bg(theme.canvas)
                     .font_family(theme.mono_font.clone())
                     .flex()
@@ -3047,10 +3099,12 @@ fn render_modal_shell(
         .id("modal-scrim")
         .absolute()
         .inset_0()
-        .bg(theme.scrim)
+        // Deep scrim + heavier haze so the panel genuinely reads as frosted glass
+        // floating above a dimmed, softened backdrop (GPUI has no backdrop-filter).
+        .bg(Theme::with_alpha(theme.scrim, 0.55))
         .flex()
         .justify_center()
-        .pt(px(86.0))
+        .pt(theme.scaled(86.0))
         .on_mouse_down(MouseButton::Left, on_dismiss)
         // Frosted-glass haze: an extra translucent veil over the app content so the
         // palette reads as a blurred backdrop (GPUI has no backdrop-filter; this is
@@ -3059,36 +3113,44 @@ fn render_modal_shell(
             div()
                 .absolute()
                 .inset_0()
-                .bg(Theme::with_alpha(theme.canvas, 0.45)),
+                .bg(Theme::with_alpha(theme.canvas, 0.6)),
         )
         .child(
             div()
                 .id("modal-box")
-                .w(px(620.0))
-                .max_h(px(460.0))
-                .rounded(px(8.0))
+                .relative()
+                .w(theme.scaled(620.0))
+                .max_h(theme.scaled(460.0))
+                .rounded(theme.scaled(10.0))
                 // Translucent panel: content behind ghosts through like frosted glass.
-                .bg(Theme::with_alpha(theme.surface_panel, 0.93))
+                .bg(Theme::with_alpha(theme.surface_panel, 0.85))
                 .border_1()
-                .border_color(Theme::with_alpha(theme.border_strong, 0.75))
+                .border_color(Theme::with_alpha(theme.border_strong, 0.9))
                 .flex()
                 .flex_col()
                 .overflow_hidden()
                 // Keep clicks inside the palette from bubbling to the dismiss scrim.
                 .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
+                // Accent light along the top edge — the palette's color anchor.
                 .child(
                     div()
-                        .h(px(48.0))
-                        .px(px(14.0))
-                        .bg(Theme::with_alpha(theme.canvas, 0.88))
+                        .w_full()
+                        .h(theme.scaled(2.0))
+                        .bg(Theme::with_alpha(theme.accent, 0.65)),
+                )
+                .child(
+                    div()
+                        .h(theme.scaled(48.0))
+                        .px(theme.scaled(14.0))
+                        .bg(Theme::with_alpha(theme.canvas, 0.78))
                         .border_b_1()
                         .border_color(theme.border)
                         .flex()
                         .items_center()
-                        .gap(px(10.0))
+                        .gap(theme.scaled(10.0))
                         .child(
                             div()
-                                .text_size(px(13.5))
+                                .text_size(theme.scaled(13.5))
                                 .font_weight(FontWeight::MEDIUM)
                                 .text_color(theme.accent)
                                 .child(prefix.to_string()),
@@ -3099,24 +3161,24 @@ fn render_modal_shell(
                 .child(
                     div()
                         .flex_1()
-                        .p(px(8.0))
+                        .p(theme.scaled(8.0))
                         .overflow_hidden()
                         .flex()
                         .flex_col()
-                        .gap(px(2.0))
+                        .gap(theme.scaled(2.0))
                         .children(rows),
                 )
                 .child(
                     div()
-                        .h(px(32.0))
-                        .px(px(14.0))
-                        .bg(Theme::with_alpha(theme.canvas, 0.88))
+                        .h(theme.scaled(32.0))
+                        .px(theme.scaled(14.0))
+                        .bg(Theme::with_alpha(theme.canvas, 0.78))
                         .border_t_1()
                         .border_color(theme.border)
                         .flex()
                         .items_center()
                         .justify_between()
-                        .text_size(px(11.0))
+                        .text_size(theme.scaled(11.0))
                         .text_color(theme.text_muted)
                         .child("↑↓ navigate  ·  ↵ select  ·  esc dismiss")
                         .child(format!("Theme: {}", theme.name)),

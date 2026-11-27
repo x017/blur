@@ -169,7 +169,7 @@ pub fn list_row(id: impl Into<ElementId>, active: bool, theme: &Theme) -> Statef
 
     if active {
         base.border_color(theme.accent)
-            .bg(theme.surface_elevated)
+            .bg(Theme::with_alpha(theme.accent, 0.16))
             .text_color(theme.text)
     } else {
         base.border_color(gpui::transparent_black())

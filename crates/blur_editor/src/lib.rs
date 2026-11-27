@@ -1703,7 +1703,9 @@ impl Render for EditorView {
                 }
             }
 
-            line_highlights.sort_by_key(|(r, _)| (r.start, r.end));
+            // Sort, then merge into disjoint segments: `with_highlights`
+            // misaligns runs when ranges overlap (selection wiping keyword color).
+            line_highlights = highlight::merge_overlapping(line_highlights);
 
             let is_active_line = cursors_by_line.contains_key(&line_idx);
             let line_num_str = if self.settings.relative_line_numbers && line_idx != primary_pt.line
@@ -1808,6 +1810,13 @@ impl Render for EditorView {
                 )
                 .on_mouse_move(cx.listener(move |this, ev: &MouseMoveEvent, _, cx| {
                     if this.is_dragging {
+                        // The button may have been released outside the canvas
+                        // (where no mouse-up listener is attached) — treat a
+                        // move with no pressed button as the end of the drag.
+                        if ev.pressed_button.is_none() {
+                            this.is_dragging = false;
+                            return;
+                        }
                         let rel_x = (f32::from(ev.position.x) - text_origin_x).max(0.0);
                         let col = (rel_x / approx_char_w).round() as usize;
                         this.handle_line_mouse_move(line_idx, col, cx);
@@ -2058,7 +2067,16 @@ impl Render for EditorView {
             .relative()
             .size_full()
             .bg(theme.surface)
-            .font_family(theme.mono_font.clone())
+            // Honor the user's configured editor typeface (settings → Typography),
+            // falling back to the theme's mono font when unset.
+            .font_family({
+                let configured = self.settings.font_family.trim();
+                if configured.is_empty() {
+                    theme.mono_font.clone()
+                } else {
+                    configured.to_string()
+                }
+            })
             .track_focus(&self.focus_handle)
             .on_key_down(cx.listener(Self::on_key_down))
             .on_scroll_wheel(cx.listener(Self::on_scroll_wheel))

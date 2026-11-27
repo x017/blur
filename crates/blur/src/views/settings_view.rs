@@ -7,7 +7,10 @@
 use blur_core::{default_bindings, ConfigStore, KeyBindingSpec, NavigationMode};
 use blur_theme::{Theme, ThemeRegistry};
 use blur_ui::{badge, button, kbd, section_label, toggle_switch, BadgeTone, ButtonVariant};
-use gpui::{div, prelude::*, px, Context, EventEmitter, FontWeight, MouseButton, Window};
+use gpui::{
+    div, prelude::*, px, Context, EventEmitter, FontWeight, MouseButton, ScrollDelta,
+    ScrollHandle, ScrollWheelEvent, Window,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SettingsCategory {
@@ -43,7 +46,9 @@ pub struct SettingsPatch {
     pub relative_line_numbers: bool,
     pub auto_pairs: bool,
     pub navigation_mode: NavigationMode,
+    pub font_family: String,
     pub ui_scale: f32,
+    pub ui_font_family: String,
     pub nav_tabs: Vec<String>,
     pub top_bar_breadcrumb: bool,
     pub top_bar_search: bool,
@@ -108,6 +113,11 @@ pub struct SettingsView {
     files_show_hidden: bool,
     files_respect_gitignore: bool,
 
+    // Wheel-scroll handles for the category body + nav sidebar (persistent so
+    // the scroll offset survives re-renders; gpui clamps them to content).
+    scroll_handle: ScrollHandle,
+    nav_scroll_handle: ScrollHandle,
+
     _extension_names: Vec<String>,
 }
 
@@ -142,6 +152,8 @@ impl SettingsView {
             git_confirm_sync: false,
             files_show_hidden: false,
             files_respect_gitignore: true,
+            scroll_handle: ScrollHandle::new(),
+            nav_scroll_handle: ScrollHandle::new(),
             _extension_names: extension_names,
         };
         view.sync_from_store(store, cx);
@@ -194,7 +206,9 @@ impl SettingsView {
             relative_line_numbers: self.relative_line_numbers,
             auto_pairs: self.auto_pairs,
             navigation_mode: self.navigation_mode,
+            font_family: self.font_family.clone(),
             ui_scale: self.ui_scale,
+            ui_font_family: self.ui_font_family.clone(),
             nav_tabs: self.nav_tabs.clone(),
             top_bar_breadcrumb: self.top_bar_breadcrumb,
             top_bar_search: self.top_bar_search,
@@ -222,6 +236,8 @@ impl SettingsView {
     fn reset_defaults(&mut self, cx: &mut Context<Self>) {
         self.font_size = 13.5;
         self.line_height = 1.65;
+        self.font_family = "JetBrains Mono".to_string();
+        self.ui_font_family = "Geist".to_string();
         self.tab_size = 4;
         self.trim_trailing_whitespace = true;
         self.relative_line_numbers = false;
@@ -455,7 +471,20 @@ impl Render for SettingsView {
                 .font_family(theme.mono_font.clone())
                 .text_size(theme.scaled(12.0))
                 .text_color(theme.text_secondary)
-                .overflow_y_scroll()
+                .overflow_hidden()
+                .track_scroll(&self.scroll_handle)
+                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                    let dy = match event.delta {
+                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                    };
+                    let cur = this.scroll_handle.offset();
+                    this.scroll_handle.set_offset(gpui::Point {
+                        x: cur.x,
+                        y: cur.y + px(dy),
+                    });
+                    cx.notify();
+                }))
                 .child(self.config_toml.clone())
                 .into_any_element(),
 
@@ -468,7 +497,20 @@ impl Render for SettingsView {
                 .flex()
                 .flex_col()
                 .gap(px(8.0))
-                .overflow_y_scroll()
+                .overflow_hidden()
+                .track_scroll(&self.scroll_handle)
+                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                    let dy = match event.delta {
+                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                    };
+                    let cur = this.scroll_handle.offset();
+                    this.scroll_handle.set_offset(gpui::Point {
+                        x: cur.x,
+                        y: cur.y + px(dy),
+                    });
+                    cx.notify();
+                }))
                 .child(section_head(
                     "Theme & Precision",
                     "Colorway, contrast, and surface tonality across the shell.",
@@ -573,7 +615,20 @@ impl Render for SettingsView {
                     .flex()
                     .flex_col()
                     .gap(px(12.0))
-                    .overflow_y_scroll()
+                    .overflow_hidden()
+                    .track_scroll(&self.scroll_handle)
+                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                        let dy = match event.delta {
+                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                        };
+                        let cur = this.scroll_handle.offset();
+                        this.scroll_handle.set_offset(gpui::Point {
+                            x: cur.x,
+                            y: cur.y + px(dy),
+                        });
+                        cx.notify();
+                    }))
                     .child(section_head(
                         "Tabs & Page Visibility Management",
                         "Control which navigation tabs and header items appear in the top bar.",
@@ -743,7 +798,20 @@ impl Render for SettingsView {
                     .flex()
                     .flex_col()
                     .gap(px(12.0))
-                    .overflow_y_scroll()
+                    .overflow_hidden()
+                    .track_scroll(&self.scroll_handle)
+                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                        let dy = match event.delta {
+                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                        };
+                        let cur = this.scroll_handle.offset();
+                        this.scroll_handle.set_offset(gpui::Point {
+                            x: cur.x,
+                            y: cur.y + px(dy),
+                        });
+                        cx.notify();
+                    }))
                     .child(section_head(
                         "Keybinding & Shortcut Configuration",
                         "Global key map, motion engine, and custom command overrides.",
@@ -954,7 +1022,20 @@ impl Render for SettingsView {
                     .flex()
                     .flex_col()
                     .gap(px(12.0))
-                    .overflow_y_scroll()
+                    .overflow_hidden()
+                    .track_scroll(&self.scroll_handle)
+                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                        let dy = match event.delta {
+                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                        };
+                        let cur = this.scroll_handle.offset();
+                        this.scroll_handle.set_offset(gpui::Point {
+                            x: cur.x,
+                            y: cur.y + px(dy),
+                        });
+                        cx.notify();
+                    }))
                     .child(section_head(
                         "Typography & Fonts",
                         "Editor and interface typefaces, scale, and rhythm.",
@@ -1007,10 +1088,35 @@ impl Render for SettingsView {
                                                     )),
                                             ),
                                     )
-                                    .child(kbd(
-                                        format!("{}  ▾", self.font_family),
-                                        &theme,
-                                    )),
+                                    .child(
+                                        kbd(format!("{}  ▾", self.font_family), &theme)
+                                            .id("set-cycle-editor-font")
+                                            .cursor_pointer()
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                const FONTS: [&str; 10] = [
+                                                    "JetBrains Mono",
+                                                    "Fira Code",
+                                                    "Cascadia Code",
+                                                    "Source Code Pro",
+                                                    "IBM Plex Mono",
+                                                    "DejaVu Sans Mono",
+                                                    "Menlo",
+                                                    "Consolas",
+                                                    "Ubuntu Mono",
+                                                    "monospace",
+                                                ];
+                                                let next = match FONTS
+                                                    .iter()
+                                                    .position(|f| *f == this.font_family)
+                                                {
+                                                    Some(i) => (i + 1) % FONTS.len(),
+                                                    None => 0,
+                                                };
+                                                this.font_family = FONTS[next].to_string();
+                                                cx.emit(SettingsViewEvent::SettingsChanged);
+                                                cx.notify();
+                                            })),
+                                    ),
                             )
                             .child(
                                 div()
@@ -1042,7 +1148,33 @@ impl Render for SettingsView {
                                                     .child("Chrome, palette, and settings labels"),
                                             ),
                                     )
-                                    .child(kbd(format!("{}  ▾", self.ui_font_family), &theme)),
+                                    .child(
+                                        kbd(format!("{}  ▾", self.ui_font_family), &theme)
+                                            .id("set-cycle-ui-font")
+                                            .cursor_pointer()
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                const FONTS: [&str; 8] = [
+                                                    "Geist",
+                                                    "Inter",
+                                                    "system-ui",
+                                                    "Segoe UI",
+                                                    "SF Pro Text",
+                                                    "Roboto",
+                                                    "Helvetica Neue",
+                                                    "Arial",
+                                                ];
+                                                let next = match FONTS
+                                                    .iter()
+                                                    .position(|f| *f == this.ui_font_family)
+                                                {
+                                                    Some(i) => (i + 1) % FONTS.len(),
+                                                    None => 0,
+                                                };
+                                                this.ui_font_family = FONTS[next].to_string();
+                                                cx.emit(SettingsViewEvent::SettingsChanged);
+                                                cx.notify();
+                                            })),
+                                    ),
                             ),
                     )
                     // Font size control (also Ctrl+= / Ctrl+- / Ctrl+0)
@@ -1247,7 +1379,20 @@ impl Render for SettingsView {
                 .flex()
                 .flex_col()
                 .gap(px(12.0))
-                .overflow_y_scroll()
+                .overflow_hidden()
+                .track_scroll(&self.scroll_handle)
+                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                    let dy = match event.delta {
+                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                    };
+                    let cur = this.scroll_handle.offset();
+                    this.scroll_handle.set_offset(gpui::Point {
+                        x: cur.x,
+                        y: cur.y + px(dy),
+                    });
+                    cx.notify();
+                }))
                 .child(section_head(
                     "LSP & Diagnostics Engine",
                     "Asynchronous semantic tokens, code navigation, and quiet inline telemetry.",
@@ -1320,7 +1465,20 @@ impl Render for SettingsView {
                 .flex()
                 .flex_col()
                 .gap(px(12.0))
-                .overflow_y_scroll()
+                .overflow_hidden()
+                .track_scroll(&self.scroll_handle)
+                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                    let dy = match event.delta {
+                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                    };
+                    let cur = this.scroll_handle.offset();
+                    this.scroll_handle.set_offset(gpui::Point {
+                        x: cur.x,
+                        y: cur.y + px(dy),
+                    });
+                    cx.notify();
+                }))
                 .child(section_head(
                     "Version Control & Diff",
                     "First-class Git status, gutter markers, and quiet commit flows.",
@@ -1396,7 +1554,20 @@ impl Render for SettingsView {
                 .flex()
                 .flex_col()
                 .gap(px(12.0))
-                .overflow_y_scroll()
+                .overflow_hidden()
+                .track_scroll(&self.scroll_handle)
+                .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                    let dy = match event.delta {
+                        ScrollDelta::Lines(pt) => pt.y * 24.0,
+                        ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                    };
+                    let cur = this.scroll_handle.offset();
+                    this.scroll_handle.set_offset(gpui::Point {
+                        x: cur.x,
+                        y: cur.y + px(dy),
+                    });
+                    cx.notify();
+                }))
                 .child(section_head(
                     "Telemetry, AI & Philosophy",
                     "Strict adherence to local-first computation, privacy, and memory hygiene.",
@@ -1506,7 +1677,20 @@ impl Render for SettingsView {
                     .flex()
                     .flex_col()
                     .gap(px(12.0))
-                    .overflow_y_scroll()
+                    .overflow_hidden()
+                    .track_scroll(&self.scroll_handle)
+                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                        let dy = match event.delta {
+                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                        };
+                        let cur = this.scroll_handle.offset();
+                        this.scroll_handle.set_offset(gpui::Point {
+                            x: cur.x,
+                            y: cur.y + px(dy),
+                        });
+                        cx.notify();
+                    }))
                     .child(section_head(
                         "Buffer & Rendering Engine",
                         "Control glyph rasterization, subpixel kerning, and buffer spacing geometry.",
@@ -2006,7 +2190,20 @@ impl Render for SettingsView {
                                     .flex()
                                     .flex_col()
                                     .gap(px(4.0))
-                                    .overflow_y_scroll()
+                                    .overflow_hidden()
+                                    .track_scroll(&self.nav_scroll_handle)
+                                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                        let dy = match event.delta {
+                                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                        };
+                                        let cur = this.nav_scroll_handle.offset();
+                                        this.nav_scroll_handle.set_offset(gpui::Point {
+                                            x: cur.x,
+                                            y: cur.y + px(dy),
+                                        });
+                                        cx.notify();
+                                    }))
                                     // Filter input pill
                                     .child(
                                         div()
