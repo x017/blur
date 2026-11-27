@@ -347,7 +347,9 @@ fn toggle_card(
                         .child(sub.to_string()),
                 ),
         )
-        .child(toggle_switch(format!("tgc-{label}"), on, theme))
+        // Static id: the card's own `.id()` scopes this switch's element path,
+        // so a constant child id is safe and avoids `String: Into<ElementId>`.
+        .child(toggle_switch("tgc", on, theme))
 }
 
 /// A compact `label … value` info row used inside service sections.
@@ -676,14 +678,24 @@ impl Render for SettingsView {
                             .gap(px(8.0))
                             .children(top_bar_entries.into_iter().enumerate().map(|(i, (key, label, sub, on))| {
                                 toggle_card(("topbar-card", i), label, sub, on, &theme).on_click(
-                                    cx.listener(move |this, _, _, cx| match key {
-                                        "breadcrumb" => {
-                                            this.top_bar_breadcrumb = !this.top_bar_breadcrumb
+                                    cx.listener(move |this, _, _, cx| {
+                                        match key {
+                                            "breadcrumb" => {
+                                                this.top_bar_breadcrumb = !this.top_bar_breadcrumb
+                                            }
+                                            "search" => {
+                                                this.top_bar_search = !this.top_bar_search
+                                            }
+                                            "stats" => this.top_bar_stats = !this.top_bar_stats,
+                                            "actions" => {
+                                                this.top_bar_actions = !this.top_bar_actions
+                                            }
+                                            _ => {
+                                                this.top_bar_quick_actions =
+                                                    !this.top_bar_quick_actions
+                                            }
                                         }
-                                        "search" => this.top_bar_search = !this.top_bar_search,
-                                        "stats" => this.top_bar_stats = !this.top_bar_stats,
-                                        "actions" => this.top_bar_actions = !this.top_bar_actions,
-                                        _ => this.top_bar_quick_actions = !this.top_bar_quick_actions,
+                                        cx.notify();
                                     }),
                                 )
                             })),
@@ -2074,7 +2086,10 @@ impl Render for SettingsView {
                                                                 } else {
                                                                     theme.text_muted
                                                                 })
-                                                                .child(right_tag),
+                                                                // Owned copy: `right_tag` may
+                                                                // borrow `self` (theme name), and
+                                                                // text children require 'static.
+                                                                .child(right_tag.to_string()),
                                                         ),
                                                 )
                                         },
