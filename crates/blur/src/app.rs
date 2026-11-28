@@ -1042,6 +1042,16 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
         cx.notify();
     }
 
+    /// Effective terminal typeface: `terminal.font_family` override, else the editor font.
+    fn terminal_font(&self) -> String {
+        let s = self.config.settings();
+        s.terminal
+            .font_family
+            .clone()
+            .filter(|f| !f.trim().is_empty())
+            .unwrap_or_else(|| s.editor.font_family.clone())
+    }
+
     /// Applies a full settings patch from the Settings view: persists every value
     /// to the layered config in a single write, pushes editor settings to open
     /// tabs, and refreshes dependent views (tree, LSP clients, status bar).
@@ -1086,6 +1096,10 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
             (
                 "ui.ui_font_family",
                 toml::Value::String(p.ui_font_family.clone()),
+            ),
+            (
+                "terminal.font_family",
+                toml::Value::String(p.terminal_font_family.clone().unwrap_or_default()),
             ),
             ("ui.nav_tabs", nav_tabs),
             (
@@ -1137,6 +1151,13 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
         let ed = self.config.settings().editor.clone();
         for tab in &self.tabs {
             tab.update(cx, |e, cx| e.update_settings(ed.clone(), cx));
+        }
+
+        // Keep the live terminal's typeface in sync (inherits the editor font
+        // when no explicit terminal override is set).
+        let term_font = self.terminal_font();
+        if let Some(tv) = &self.terminal_view {
+            tv.update(cx, |t, cx| t.set_font_family(term_font, cx));
         }
 
         // LSP enable / disable across open tabs.
@@ -1324,6 +1345,8 @@ impl<T> ProtocolHandler<T> where T: Stream + Send + Sync + 'static {\n\
         } else if self.terminal_view.is_none() {
             let root = self.workspace_root.clone();
             let tv = cx.new(|cx| TerminalView::new(root, cx));
+            let font = self.terminal_font();
+            tv.update(cx, |t, cx| t.set_font_family(font, cx));
             tv.read(cx).focus(window);
             self.terminal_view = Some(tv);
         } else if self.terminal_visible {

@@ -6,9 +6,9 @@
 
 use blur_core::{default_bindings, ConfigStore, KeyBindingSpec, NavigationMode};
 use blur_theme::{Theme, ThemeRegistry};
-use blur_ui::{badge, button, kbd, section_label, toggle_switch, BadgeTone, ButtonVariant};
+use blur_ui::{badge, button, kbd, section_label, toggle_switch, BadgeTone, ButtonVariant, TextInput, TextInputEvent};
 use gpui::{
-    div, prelude::*, px, Context, EventEmitter, FontWeight, MouseButton, ScrollDelta,
+    div, prelude::*, px, Context, Entity, EventEmitter, FontWeight, MouseButton, ScrollDelta,
     ScrollHandle, ScrollWheelEvent, Window,
 };
 
@@ -23,6 +23,14 @@ pub enum SettingsCategory {
     Theme,
     Telemetry,
     RawToml,
+}
+
+/// Which typeface slot the Font Library writes to.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FontTarget {
+    Editor,
+    Interface,
+    Terminal,
 }
 
 #[derive(Debug, Clone)]
@@ -49,6 +57,8 @@ pub struct SettingsPatch {
     pub font_family: String,
     pub ui_scale: f32,
     pub ui_font_family: String,
+    /// `None` = inherit `editor.font_family` (written as an empty string).
+    pub terminal_font_family: Option<String>,
     pub nav_tabs: Vec<String>,
     pub top_bar_breadcrumb: bool,
     pub top_bar_search: bool,
@@ -96,6 +106,8 @@ pub struct SettingsView {
     // UI
     ui_scale: f32,
     ui_font_family: String,
+    /// Terminal typeface override (`None` = inherit the editor font).
+    terminal_font_family: Option<String>,
     active_theme: String,
     nav_tabs: Vec<String>,
     top_bar_breadcrumb: bool,
@@ -113,6 +125,12 @@ pub struct SettingsView {
     files_show_hidden: bool,
     files_respect_gitignore: bool,
 
+    // Font library state (system fonts enumerated once at construction).
+    font_target: FontTarget,
+    font_names: Vec<String>,
+    font_query: String,
+    font_filter: Entity<TextInput>,
+
     // Wheel-scroll handles for the category body + nav sidebar (persistent so
     // the scroll offset survives re-renders; gpui clamps them to content).
     scroll_handle: ScrollHandle,
@@ -125,6 +143,29 @@ impl EventEmitter<SettingsViewEvent> for SettingsView {}
 
 impl SettingsView {
     pub fn new(store: &ConfigStore, extension_names: Vec<String>, cx: &mut Context<Self>) -> Self {
+        // Every typeface installed on this machine, for the Font Library list.
+        let mut font_names = cx.text_system().all_font_names();
+        font_names.sort_by_key(|n| n.to_lowercase());
+        font_names.dedup();
+
+        let font_filter = cx.new(|cx| {
+            TextInput::new("Filter installed fonts\u{2026}", cx)
+                .borderless()
+                .font_size(13.0)
+        });
+        cx.subscribe(&font_filter, |this, _input, ev: &TextInputEvent, cx| match ev {
+            TextInputEvent::Changed(q) => {
+                this.font_query = q.clone();
+                cx.notify();
+            }
+            TextInputEvent::Submit(q) => {
+                let q = q.clone();
+                this.apply_typed_font(&q, cx);
+            }
+            _ => {}
+        })
+        .detach();
+
         let mut view = Self {
             category: SettingsCategory::Core,
             config_toml: String::new(),
@@ -152,6 +193,11 @@ impl SettingsView {
             git_confirm_sync: false,
             files_show_hidden: false,
             files_respect_gitignore: true,
+            terminal_font_family: None,
+            font_target: FontTarget::Editor,
+            font_names,
+            font_query: String::new(),
+            font_filter,
             scroll_handle: ScrollHandle::new(),
             nav_scroll_handle: ScrollHandle::new(),
             _extension_names: extension_names,
@@ -175,6 +221,11 @@ impl SettingsView {
         self.font_family = s.editor.font_family.clone();
         self.ui_scale = s.ui.ui_scale.clamp(0.75, 1.75);
         self.ui_font_family = s.ui.ui_font_family.clone();
+        self.terminal_font_family = s
+            .terminal
+            .font_family
+            .clone()
+            .filter(|f| !f.trim().is_empty());
         self.active_theme = s.ui.theme.clone();
         self.nav_tabs = if s.ui.nav_tabs.is_empty() {
             default_nav_tabs()
@@ -209,6 +260,7 @@ impl SettingsView {
             font_family: self.font_family.clone(),
             ui_scale: self.ui_scale,
             ui_font_family: self.ui_font_family.clone(),
+            terminal_font_family: self.terminal_font_family.clone(),
             nav_tabs: self.nav_tabs.clone(),
             top_bar_breadcrumb: self.top_bar_breadcrumb,
             top_bar_search: self.top_bar_search,
@@ -233,11 +285,50 @@ impl SettingsView {
         }
     }
 
+    /// Writes the picked typeface into the slot selected by the target cards.
+    fn apply_font(&mut self, family: String, cx: &mut Context<Self>) {
+        let family = family.trim().to_string();
+        if family.is_empty() {
+            return;
+        }
+        match self.font_target {
+            FontTarget::Editor => self.font_family = family,
+            FontTarget::Interface => self.ui_font_family = family,
+            FontTarget::Terminal => self.terminal_font_family = Some(family),
+        }
+        cx.emit(SettingsViewEvent::SettingsChanged);
+        cx.notify();
+    }
+
+    /// Enter / "Use …": prefer the closest installed match, else the raw name.
+    fn apply_typed_font(&mut self, raw: &str, cx: &mut Context<Self>) {
+        let raw = raw.trim();
+        if raw.is_empty() {
+            return;
+        }
+        let q = raw.to_lowercase();
+        let best = self
+            .font_names
+            .iter()
+            .find(|n| n.to_lowercase() == q)
+            .or_else(|| {
+                self.font_names
+                    .iter()
+                    .find(|n| n.to_lowercase().starts_with(&q))
+            })
+            .cloned()
+            .unwrap_or_else(|| raw.to_string());
+        self.apply_font(best, cx);
+    }
+
     fn reset_defaults(&mut self, cx: &mut Context<Self>) {
         self.font_size = 13.5;
         self.line_height = 1.65;
         self.font_family = "JetBrains Mono".to_string();
         self.ui_font_family = "Geist".to_string();
+        self.terminal_font_family = None;
+        self.font_query.clear();
+        self.font_filter.update(cx, |inp, cx| inp.clear(cx));
         self.tab_size = 4;
         self.trim_trailing_whitespace = true;
         self.relative_line_numbers = false;
@@ -1012,6 +1103,31 @@ impl Render for SettingsView {
             SettingsCategory::Typography => {
                 let fs = self.font_size;
                 let us = self.ui_scale;
+                let target = self.font_target;
+                let target_label = match target {
+                    FontTarget::Editor => "EDITOR",
+                    FontTarget::Interface => "INTERFACE",
+                    FontTarget::Terminal => "TERMINAL",
+                };
+                let term_font = self
+                    .terminal_font_family
+                    .clone()
+                    .unwrap_or_else(|| self.font_family.clone());
+                let has_term_override = self.terminal_font_family.is_some();
+                let current_family = match target {
+                    FontTarget::Editor => self.font_family.clone(),
+                    FontTarget::Interface => self.ui_font_family.clone(),
+                    FontTarget::Terminal => term_font.clone(),
+                };
+                let filter_q = self.font_query.trim().to_lowercase();
+                let matched: Vec<&String> = self
+                    .font_names
+                    .iter()
+                    .filter(|n| filter_q.is_empty() || n.to_lowercase().contains(&filter_q))
+                    .collect();
+                let matched_total = matched.len();
+                let truncated = matched_total > 60;
+                let font_rows: Vec<String> = matched.into_iter().take(60).cloned().collect();
                 div()
                     .id("set-typo-scroll")
                     .flex_1()
@@ -1042,23 +1158,58 @@ impl Render for SettingsView {
                         "[ui.typography]",
                         &theme,
                     ))
-                    // Font family cards
-                    .child(
+                    // Typeface target cards — click one, then pick from the Font Library below.
+                    .child({
+                        let cards = [
+                            (
+                                FontTarget::Editor,
+                                "Editor Typeface",
+                                "Buffer & code glyphs",
+                                self.font_family.clone(),
+                            ),
+                            (
+                                FontTarget::Interface,
+                                "Interface Typeface",
+                                "Chrome, palette, settings",
+                                self.ui_font_family.clone(),
+                            ),
+                            (
+                                FontTarget::Terminal,
+                                "Terminal Typeface",
+                                "PTY & shell output",
+                                term_font.clone(),
+                            ),
+                        ];
                         div()
                             .flex_shrink_0()
                             .flex()
                             .gap(px(10.0))
-                            .child(
+                            .children(cards.into_iter().map(|(t, title, sub, family)| {
+                                let active = target == t;
                                 div()
+                                    .id(("set-font-target", t as u32))
                                     .flex_1()
                                     .p(px(12.0))
                                     .rounded(px(8.0))
-                                    .bg(theme.surface_panel)
+                                    .bg(if active {
+                                        Theme::with_alpha(theme.accent, 0.14)
+                                    } else {
+                                        theme.surface_panel
+                                    })
                                     .border_1()
-                                    .border_color(Theme::with_alpha(theme.border_strong, 0.4))
+                                    .border_color(if active {
+                                        theme.accent
+                                    } else {
+                                        Theme::with_alpha(theme.border_strong, 0.4)
+                                    })
+                                    .cursor_pointer()
                                     .flex()
                                     .items_center()
                                     .justify_between()
+                                    .on_click(cx.listener(move |this, _, _, cx| {
+                                        this.font_target = t;
+                                        cx.notify();
+                                    }))
                                     .child(
                                         div()
                                             .flex()
@@ -1069,114 +1220,47 @@ impl Render for SettingsView {
                                                     .text_size(px(12.5))
                                                     .font_weight(FontWeight::MEDIUM)
                                                     .text_color(theme.text)
-                                                    .child("Editor Typeface"),
-                                            )
-                                            .child(
-                                                div()
-                                                    .flex()
-                                                    .items_center()
-                                                    .gap(px(6.0))
-                                                    .child(badge(
-                                                        "Ligatures active",
-                                                        BadgeTone::Accent,
-                                                        &theme,
-                                                    ))
-                                                    .child(badge(
-                                                        "calt, dlig, ss01",
-                                                        BadgeTone::Neutral,
-                                                        &theme,
-                                                    )),
-                                            ),
-                                    )
-                                    .child(
-                                        kbd(format!("{}  ▾", self.font_family), &theme)
-                                            .id("set-cycle-editor-font")
-                                            .cursor_pointer()
-                                            .on_click(cx.listener(|this, _, _, cx| {
-                                                const FONTS: [&str; 10] = [
-                                                    "JetBrains Mono",
-                                                    "Fira Code",
-                                                    "Cascadia Code",
-                                                    "Source Code Pro",
-                                                    "IBM Plex Mono",
-                                                    "DejaVu Sans Mono",
-                                                    "Menlo",
-                                                    "Consolas",
-                                                    "Ubuntu Mono",
-                                                    "monospace",
-                                                ];
-                                                let next = match FONTS
-                                                    .iter()
-                                                    .position(|f| *f == this.font_family)
-                                                {
-                                                    Some(i) => (i + 1) % FONTS.len(),
-                                                    None => 0,
-                                                };
-                                                this.font_family = FONTS[next].to_string();
-                                                cx.emit(SettingsViewEvent::SettingsChanged);
-                                                cx.notify();
-                                            })),
-                                    ),
-                            )
-                            .child(
-                                div()
-                                    .flex_1()
-                                    .p(px(12.0))
-                                    .rounded(px(8.0))
-                                    .bg(theme.surface_panel)
-                                    .border_1()
-                                    .border_color(Theme::with_alpha(theme.border_strong, 0.4))
-                                    .flex()
-                                    .items_center()
-                                    .justify_between()
-                                    .child(
-                                        div()
-                                            .flex()
-                                            .flex_col()
-                                            .gap(px(3.0))
-                                            .child(
-                                                div()
-                                                    .text_size(px(12.5))
-                                                    .font_weight(FontWeight::MEDIUM)
-                                                    .text_color(theme.text)
-                                                    .child("Interface Typeface"),
+                                                    .child(title),
                                             )
                                             .child(
                                                 div()
                                                     .text_size(px(11.0))
                                                     .text_color(theme.text_muted)
-                                                    .child("Chrome, palette, and settings labels"),
+                                                    .child(sub),
                                             ),
                                     )
                                     .child(
-                                        kbd(format!("{}  ▾", self.ui_font_family), &theme)
-                                            .id("set-cycle-ui-font")
-                                            .cursor_pointer()
-                                            .on_click(cx.listener(|this, _, _, cx| {
-                                                const FONTS: [&str; 8] = [
-                                                    "Geist",
-                                                    "Inter",
-                                                    "system-ui",
-                                                    "Segoe UI",
-                                                    "SF Pro Text",
-                                                    "Roboto",
-                                                    "Helvetica Neue",
-                                                    "Arial",
-                                                ];
-                                                let next = match FONTS
-                                                    .iter()
-                                                    .position(|f| *f == this.ui_font_family)
-                                                {
-                                                    Some(i) => (i + 1) % FONTS.len(),
-                                                    None => 0,
-                                                };
-                                                this.ui_font_family = FONTS[next].to_string();
-                                                cx.emit(SettingsViewEvent::SettingsChanged);
-                                                cx.notify();
-                                            })),
-                                    ),
-                            ),
-                    )
+                                        div()
+                                            .flex()
+                                            .items_center()
+                                            .gap(px(6.0))
+                                            .child(kbd(family, &theme))
+                                            .when(
+                                                t == FontTarget::Terminal && has_term_override,
+                                                |d| {
+                                                    d.child(
+                                                        div()
+                                                            .id("set-term-font-clear")
+                                                            .cursor_pointer()
+                                                            .text_size(px(10.5))
+                                                            .text_color(theme.text_muted)
+                                                            .on_click(cx.listener(
+                                                                |this, _, _, cx| {
+                                                                    this.terminal_font_family =
+                                                                        None;
+                                                                    cx.emit(
+                                                                        SettingsViewEvent::SettingsChanged,
+                                                                    );
+                                                                    cx.notify();
+                                                                },
+                                                            ))
+                                                            .child("inherit ×"),
+                                                    )
+                                                },
+                                            ),
+                                    )
+                            }))
+                    })
                     // Font size control (also Ctrl+= / Ctrl+- / Ctrl+0)
                     .child(
                         div()
@@ -1364,6 +1448,142 @@ impl Render for SettingsView {
                                         })),
                                     ),
                             ),
+                    )
+                    // Font Library — every installed typeface, rendered in itself.
+                    .child(
+                        div()
+                            .flex_shrink_0()
+                            .mt(px(4.0))
+                            .rounded(px(8.0))
+                            .bg(theme.surface_panel)
+                            .border_1()
+                            .border_color(Theme::with_alpha(theme.border_strong, 0.4))
+                            .flex()
+                            .flex_col()
+                            .overflow_hidden()
+                            // Panel header
+                            .child(
+                                div()
+                                    .px(px(12.0))
+                                    .py(px(8.0))
+                                    .border_b_1()
+                                    .border_color(Theme::with_alpha(theme.border_strong, 0.4))
+                                    .flex()
+                                    .items_center()
+                                    .justify_between()
+                                    .child(section_label("FONT LIBRARY", &theme))
+                                    .child(
+                                        div()
+                                            .flex()
+                                            .items_center()
+                                            .gap(px(8.0))
+                                            .child(badge(
+                                                format!("→ {target_label}"),
+                                                BadgeTone::Accent,
+                                                &theme,
+                                            ))
+                                            .child(
+                                                div()
+                                                    .text_size(px(11.0))
+                                                    .text_color(theme.text_muted)
+                                                    .child(format!("{matched_total} installed")),
+                                            ),
+                                    ),
+                            )
+                            // Filter + free-form apply
+                            .child(
+                                div()
+                                    .px(px(12.0))
+                                    .py(px(8.0))
+                                    .flex()
+                                    .items_center()
+                                    .gap(px(8.0))
+                                    .child(div().flex_1().child(self.font_filter.clone()))
+                                    .when(!self.font_query.trim().is_empty(), |d| {
+                                        d.child(
+                                            button(
+                                                "set-font-apply-typed",
+                                                format!("Use \u{201c}{}\u{201d}", self.font_query.trim()),
+                                                ButtonVariant::Secondary,
+                                                &theme,
+                                            )
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                let q = this.font_query.clone();
+                                                this.apply_typed_font(&q, cx);
+                                            })),
+                                        )
+                                    }),
+                            )
+                            // Rows — each name rendered in its own face as a live preview.
+                            .child(
+                                div()
+                                    .px(px(8.0))
+                                    .pb(px(8.0))
+                                    .flex()
+                                    .flex_col()
+                                    .gap(px(2.0))
+                                    .children(font_rows.iter().enumerate().map(|(i, name)| {
+                                        let is_current =
+                                            name.eq_ignore_ascii_case(&current_family);
+                                        let fam = name.clone();
+                                        div()
+                                            .id(("set-font-row", i))
+                                            .w_full()
+                                            .px(px(10.0))
+                                            .py(px(6.0))
+                                            .rounded(px(4.0))
+                                            .border_1()
+                                            .border_color(if is_current {
+                                                theme.accent
+                                            } else {
+                                                gpui::transparent_black()
+                                            })
+                                            .bg(if is_current {
+                                                Theme::with_alpha(theme.accent, 0.14)
+                                            } else {
+                                                gpui::transparent_black()
+                                            })
+                                            .hover(|s| {
+                                                s.bg(Theme::with_alpha(theme.surface_hover, 0.7))
+                                            })
+                                            .cursor_pointer()
+                                            .flex()
+                                            .items_center()
+                                            .justify_between()
+                                            .gap(px(10.0))
+                                            .on_click(cx.listener(move |this, _, _, cx| {
+                                                this.apply_font(fam.clone(), cx);
+                                            }))
+                                            .child(
+                                                div()
+                                                    .font_family(name.clone())
+                                                    .text_size(px(13.0))
+                                                    .text_color(theme.text)
+                                                    .child(name.clone()),
+                                            )
+                                            .child(
+                                                div()
+                                                    .font_family(name.clone())
+                                                    .text_size(px(12.0))
+                                                    .text_color(theme.text_muted)
+                                                    .child("Ag0123 · The quick brown fox"),
+                                            )
+                                    })),
+                            )
+                            .when(truncated, |d| {
+                                d.child(
+                                    div()
+                                        .px(px(12.0))
+                                        .pb(px(8.0))
+                                        .text_size(px(11.0))
+                                        .text_color(theme.text_muted)
+                                        .child(format!(
+                                            "Showing {} of {} matches — type more to narrow.",
+                                            font_rows.len(),
+                                            matched_total
+                                        )),
+                                )
+                            }),
                     )
                     .into_any_element()
             }
