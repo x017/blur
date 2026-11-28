@@ -9,7 +9,10 @@ use std::time::Duration;
 use blur_theme::Theme;
 use blur_ui::{badge, button, section_label, BadgeTone, ButtonVariant, TextInput, TextInputEvent};
 use blur_utils::{http, json, regex_tester};
-use gpui::{div, prelude::*, px, Context, Entity, FontWeight, MouseButton, Window};
+use gpui::{
+    div, prelude::*, px, Context, Entity, FontWeight, MouseButton, ScrollDelta, ScrollHandle,
+    ScrollWheelEvent, Window,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UtilityTab {
@@ -67,6 +70,9 @@ pub struct UtilitiesView {
     json_input: Entity<TextInput>,
     json_output: String,
     error: Option<String>,
+    /// Wheel-scroll handles for the HTTP request payload + response bodies.
+    payload_handle: ScrollHandle,
+    response_handle: ScrollHandle,
 }
 
 impl UtilitiesView {
@@ -132,6 +138,8 @@ impl UtilitiesView {
             json_input,
             json_output: default_pretty,
             error: None,
+            payload_handle: ScrollHandle::new(),
+            response_handle: ScrollHandle::new(),
         }
     }
 
@@ -499,6 +507,20 @@ impl UtilitiesView {
                                             .flex()
                                             .flex_col()
                                             .overflow_hidden()
+                                            .id("util-payload-scroll")
+                                            .track_scroll(&self.payload_handle)
+                                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                                let dy = match event.delta {
+                                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                                };
+                                                let cur = this.payload_handle.offset();
+                                                this.payload_handle.set_offset(gpui::Point {
+                                                    x: cur.x,
+                                                    y: cur.y + px(dy),
+                                                });
+                                                cx.notify();
+                                            }))
                                             .children(payload_rows),
                                     ),
                             )
@@ -591,6 +613,20 @@ impl UtilitiesView {
                                             .flex()
                                             .flex_col()
                                             .overflow_hidden()
+                                            .id("util-response-scroll")
+                                            .track_scroll(&self.response_handle)
+                                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                                let dy = match event.delta {
+                                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                                };
+                                                let cur = this.response_handle.offset();
+                                                this.response_handle.set_offset(gpui::Point {
+                                                    x: cur.x,
+                                                    y: cur.y + px(dy),
+                                                });
+                                                cx.notify();
+                                            }))
                                             .children(resp_rows),
                                     ),
                             )

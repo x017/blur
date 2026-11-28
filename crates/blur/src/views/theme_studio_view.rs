@@ -3,18 +3,25 @@
 
 use blur_theme::{Theme, ThemeRegistry};
 use blur_ui::{badge, button, kbd, section_label, toggle_switch, BadgeTone, ButtonVariant};
-use gpui::{div, prelude::*, px, Context, EventEmitter, FontWeight, MouseButton, Window};
+use gpui::{
+    div, prelude::*, px, Context, EventEmitter, FontWeight, MouseButton, ScrollDelta,
+    ScrollHandle, ScrollWheelEvent, Window,
+};
 
 #[derive(Debug, Clone)]
 pub enum ThemeStudioEvent {
     ThemeSelected(String),
     Notification(String),
+    /// Geometry card picked in the studio → persist `ui.tab_radius` live.
+    TabRadius(u32),
 }
 
 pub struct ThemeStudioView {
     active_section: usize,
     continuous_geometry: bool,
     selected_shape: usize, // 0: Rounded Pill (16px), 1: Subtle Soft (4px), 2: Sharp Minimal (0px), 3: Capsule Grid (12px)
+    /// Wheel-scroll handle for the right configuration column.
+    scroll_handle: ScrollHandle,
     tab_radius: u32,
     active_accent_idx: usize,
 }
@@ -28,6 +35,7 @@ impl ThemeStudioView {
             continuous_geometry: true,
             selected_shape: 0,
             tab_radius: 16,
+            scroll_handle: ScrollHandle::new(),
             active_accent_idx: 0,
         }
     }
@@ -320,6 +328,20 @@ impl Render for ThemeStudioView {
                             .flex_col()
                             .gap(px(16.0))
                             .overflow_hidden()
+                            .id("ts-main-scroll")
+                            .track_scroll(&self.scroll_handle)
+                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                let dy = match event.delta {
+                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                };
+                                let cur = this.scroll_handle.offset();
+                                this.scroll_handle.set_offset(gpui::Point {
+                                    x: cur.x,
+                                    y: cur.y + px(dy),
+                                });
+                                cx.notify();
+                            }))
                             // SECTION 1: Colorway & Atmosphere Engine (6 Presets)
                             .child(
                                 div()
@@ -504,6 +526,8 @@ impl Render for ThemeStudioView {
                                                                     cx.listener(move |this, _, _, cx| {
                                                                         this.selected_shape = i;
                                                                         this.tab_radius = rad;
+                                                                        // Apply the radius to the real header nav pills / tab section.
+                                                                        cx.emit(ThemeStudioEvent::TabRadius(rad));
                                                                         cx.notify();
                                                                     }),
                                                                 )

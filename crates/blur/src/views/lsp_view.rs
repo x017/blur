@@ -5,7 +5,10 @@ use std::path::Path;
 use blur_lsp::{builtin_server_presets, find_executable, LspManager, ServerConfig, ServerInfo};
 use blur_theme::Theme;
 use blur_ui::{badge, button, section_label, BadgeTone, ButtonVariant};
-use gpui::{div, prelude::*, px, Context, FontWeight, MouseButton, Window};
+use gpui::{
+    div, prelude::*, px, Context, FontWeight, MouseButton, ScrollDelta, ScrollHandle,
+    ScrollWheelEvent, Window,
+};
 
 struct ShowcaseDaemon {
     name: &'static str,
@@ -51,6 +54,8 @@ pub struct LspView {
     presets: Vec<ServerConfig>,
     selected_name: String,
     _dap_configs: Vec<blur_dap::LaunchConfig>,
+    /// Wheel-scroll handle for the registered-daemons list.
+    daemon_handle: ScrollHandle,
 }
 
 impl LspView {
@@ -62,6 +67,7 @@ impl LspView {
             presets,
             selected_name: "rust-analyzer".to_string(),
             _dap_configs: dap_configs,
+            daemon_handle: ScrollHandle::new(),
         }
     }
 }
@@ -297,6 +303,20 @@ impl Render for LspView {
                             .flex_col()
                             .gap(px(8.0))
                             .overflow_hidden()
+                            .id("lsp-daemons-scroll")
+                            .track_scroll(&self.daemon_handle)
+                            .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                let dy = match event.delta {
+                                    ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                    ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                };
+                                let cur = this.daemon_handle.offset();
+                                this.daemon_handle.set_offset(gpui::Point {
+                                    x: cur.x,
+                                    y: cur.y + px(dy),
+                                });
+                                cx.notify();
+                            }))
                             .child(
                                 div()
                                     .px(px(4.0))

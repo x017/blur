@@ -17,6 +17,8 @@ pub struct TerminalView {
     terminal: Option<Terminal>,
     cwd: PathBuf,
     error: Option<String>,
+    /// Typeface override pushed from Settings (None = theme mono font).
+    font_family: Option<String>,
 }
 
 impl Focusable for TerminalView {
@@ -32,9 +34,16 @@ impl TerminalView {
             terminal: None,
             cwd,
             error: None,
+            font_family: None,
         };
         this.spawn_shell(cx);
         this
+    }
+
+    /// Typeface pushed by the app shell on settings changes.
+    pub fn set_font_family(&mut self, family: String, cx: &mut Context<Self>) {
+        self.font_family = Some(family);
+        cx.notify();
     }
 
     pub fn spawn_shell(&mut self, cx: &mut Context<Self>) {
@@ -325,7 +334,12 @@ impl Render for TerminalView {
             .id("terminal-surface")
             .size_full()
             .bg(theme.term_bg)
-            .font_family(theme.mono_font.clone())
+            .font_family(
+                self.font_family
+                    .clone()
+                    .filter(|f| !f.trim().is_empty())
+                    .unwrap_or_else(|| theme.mono_font.clone()),
+            )
             .track_focus(&self.focus_handle)
             .on_key_down(cx.listener(Self::on_key_down))
             .on_scroll_wheel(cx.listener(Self::on_scroll_wheel))

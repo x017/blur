@@ -7,7 +7,8 @@ use blur_theme::Theme;
 use blur_ui::{badge, button, kbd, section_label, BadgeTone, ButtonVariant, TextInput, TextInputEvent};
 use blur_workspace::{search, FileIndex, FuzzyMatch, SearchQuery, SearchResults};
 use gpui::{
-    div, prelude::*, px, Context, Entity, EventEmitter, FontWeight, MouseButton, Window,
+    div, prelude::*, px, Context, Entity, EventEmitter, FontWeight, MouseButton, ScrollDelta,
+    ScrollHandle, ScrollWheelEvent, Window,
 };
 
 /// Mode inside the File Finder view.
@@ -112,6 +113,9 @@ pub struct FileFinderView {
     whole_word: bool,
     use_regex: bool,
     using_showcase: bool,
+    /// Wheel-scroll handles for the results list + the code preview pane.
+    results_handle: ScrollHandle,
+    preview_handle: ScrollHandle,
 }
 
 impl EventEmitter<FileFinderEvent> for FileFinderView {}
@@ -167,17 +171,41 @@ impl FileFinderView {
             whole_word: true,
             use_regex: false,
             using_showcase: true,
+            results_handle: ScrollHandle::new(),
+            preview_handle: ScrollHandle::new(),
         }
     }
 
     pub fn set_mode(&mut self, mode: FinderMode, window: &mut Window, cx: &mut Context<Self>) {
+        self.set_mode_no_focus(mode, cx);
+        self.query_input.read(cx).focus(window);
+        cx.notify();
+    }
+
+    /// Switches finder mode without taking keyboard focus (usable from commands).
+    pub fn set_mode_no_focus(&mut self, mode: FinderMode, cx: &mut Context<Self>) {
         self.mode = mode;
         self.selected_idx = 0;
         let q = self.query_input.read(cx).value().to_string();
         if q != "src/protocol rust" {
             self.run_query(&q, cx);
         }
-        self.query_input.read(cx).focus(window);
+        cx.notify();
+    }
+
+    /// Replaces the search roots (e.g. after Open Folder) and rescans the index.
+    pub fn set_roots(&mut self, roots: Vec<PathBuf>, cx: &mut Context<Self>) {
+        self.roots = roots;
+        self.file_index = FileIndex::scan(&self.roots);
+        self.search_results = None;
+        self.preview_path = None;
+        self.preview_lines.clear();
+        self.selected_idx = 0;
+        let q = self.query_input.read(cx).value().to_string();
+        if q != "src/protocol rust" {
+            self.using_showcase = false;
+            self.run_query(&q, cx);
+        }
         cx.notify();
     }
 
@@ -879,6 +907,20 @@ impl Render for FileFinderView {
                                 div()
                                     .flex_1()
                                     .overflow_hidden()
+                                    .id("ff-results-scroll")
+                                    .track_scroll(&self.results_handle)
+                                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                        let dy = match event.delta {
+                                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                        };
+                                        let cur = this.results_handle.offset();
+                                        this.results_handle.set_offset(gpui::Point {
+                                            x: cur.x,
+                                            y: cur.y + px(dy),
+                                        });
+                                        cx.notify();
+                                    }))
                                     .flex()
                                     .flex_col()
                                     .gap(px(6.0))
@@ -994,6 +1036,20 @@ impl Render for FileFinderView {
                                     .bg(theme.surface)
                                     .font_family(theme.mono_font.clone())
                                     .overflow_hidden()
+                                    .id("ff-preview-scroll")
+                                    .track_scroll(&self.preview_handle)
+                                    .on_scroll_wheel(cx.listener(|this, event: &ScrollWheelEvent, _, cx| {
+                                        let dy = match event.delta {
+                                            ScrollDelta::Lines(pt) => pt.y * 24.0,
+                                            ScrollDelta::Pixels(pt) => f32::from(pt.y),
+                                        };
+                                        let cur = this.preview_handle.offset();
+                                        this.preview_handle.set_offset(gpui::Point {
+                                            x: cur.x,
+                                            y: cur.y + px(dy),
+                                        });
+                                        cx.notify();
+                                    }))
                                     .flex()
                                     .flex_col()
                                     .children(preview_rows),
