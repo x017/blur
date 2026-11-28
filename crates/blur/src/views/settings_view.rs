@@ -1261,6 +1261,142 @@ impl Render for SettingsView {
                                     )
                             }))
                     })
+                    // Font Library — every installed typeface, rendered in itself.
+                    .child(
+                        div()
+                            .flex_shrink_0()
+                            .mt(px(4.0))
+                            .rounded(px(8.0))
+                            .bg(theme.surface_panel)
+                            .border_1()
+                            .border_color(Theme::with_alpha(theme.border_strong, 0.4))
+                            .flex()
+                            .flex_col()
+                            .overflow_hidden()
+                            // Panel header
+                            .child(
+                                div()
+                                    .px(px(12.0))
+                                    .py(px(8.0))
+                                    .border_b_1()
+                                    .border_color(Theme::with_alpha(theme.border_strong, 0.4))
+                                    .flex()
+                                    .items_center()
+                                    .justify_between()
+                                    .child(section_label("FONT LIBRARY", &theme))
+                                    .child(
+                                        div()
+                                            .flex()
+                                            .items_center()
+                                            .gap(px(8.0))
+                                            .child(badge(
+                                                format!("→ {target_label}"),
+                                                BadgeTone::Accent,
+                                                &theme,
+                                            ))
+                                            .child(
+                                                div()
+                                                    .text_size(px(11.0))
+                                                    .text_color(theme.text_muted)
+                                                    .child(format!("{matched_total} installed")),
+                                            ),
+                                    ),
+                            )
+                            // Filter + free-form apply
+                            .child(
+                                div()
+                                    .px(px(12.0))
+                                    .py(px(8.0))
+                                    .flex()
+                                    .items_center()
+                                    .gap(px(8.0))
+                                    .child(div().flex_1().child(self.font_filter.clone()))
+                                    .when(!self.font_query.trim().is_empty(), |d| {
+                                        d.child(
+                                            button(
+                                                "set-font-apply-typed",
+                                                format!("Use \u{201c}{}\u{201d}", self.font_query.trim()),
+                                                ButtonVariant::Secondary,
+                                                &theme,
+                                            )
+                                            .on_click(cx.listener(|this, _, _, cx| {
+                                                let q = this.font_query.clone();
+                                                this.apply_typed_font(&q, cx);
+                                            })),
+                                        )
+                                    }),
+                            )
+                            // Rows — each name rendered in its own face as a live preview.
+                            .child(
+                                div()
+                                    .px(px(8.0))
+                                    .pb(px(8.0))
+                                    .flex()
+                                    .flex_col()
+                                    .gap(px(2.0))
+                                    .children(font_rows.iter().enumerate().map(|(i, name)| {
+                                        let is_current =
+                                            name.eq_ignore_ascii_case(&current_family);
+                                        let fam = name.clone();
+                                        div()
+                                            .id(("set-font-row", i))
+                                            .w_full()
+                                            .px(px(10.0))
+                                            .py(px(6.0))
+                                            .rounded(px(4.0))
+                                            .border_1()
+                                            .border_color(if is_current {
+                                                theme.accent
+                                            } else {
+                                                gpui::transparent_black()
+                                            })
+                                            .bg(if is_current {
+                                                Theme::with_alpha(theme.accent, 0.14)
+                                            } else {
+                                                gpui::transparent_black()
+                                            })
+                                            .hover(|s| {
+                                                s.bg(Theme::with_alpha(theme.surface_hover, 0.7))
+                                            })
+                                            .cursor_pointer()
+                                            .flex()
+                                            .items_center()
+                                            .justify_between()
+                                            .gap(px(10.0))
+                                            .on_click(cx.listener(move |this, _, _, cx| {
+                                                this.apply_font(fam.clone(), cx);
+                                            }))
+                                            .child(
+                                                div()
+                                                    .font_family(name.clone())
+                                                    .text_size(px(13.0))
+                                                    .text_color(theme.text)
+                                                    .child(name.clone()),
+                                            )
+                                            .child(
+                                                div()
+                                                    .font_family(name.clone())
+                                                    .text_size(px(12.0))
+                                                    .text_color(theme.text_muted)
+                                                    .child("Ag0123 · The quick brown fox"),
+                                            )
+                                    })),
+                            )
+                            .when(truncated, |d| {
+                                d.child(
+                                    div()
+                                        .px(px(12.0))
+                                        .pb(px(8.0))
+                                        .text_size(px(11.0))
+                                        .text_color(theme.text_muted)
+                                        .child(format!(
+                                            "Showing {} of {} matches — type more to narrow.",
+                                            font_rows.len(),
+                                            matched_total
+                                        )),
+                                )
+                            }),
+                    )
                     // Font size control (also Ctrl+= / Ctrl+- / Ctrl+0)
                     .child(
                         div()
@@ -1448,142 +1584,6 @@ impl Render for SettingsView {
                                         })),
                                     ),
                             ),
-                    )
-                    // Font Library — every installed typeface, rendered in itself.
-                    .child(
-                        div()
-                            .flex_shrink_0()
-                            .mt(px(4.0))
-                            .rounded(px(8.0))
-                            .bg(theme.surface_panel)
-                            .border_1()
-                            .border_color(Theme::with_alpha(theme.border_strong, 0.4))
-                            .flex()
-                            .flex_col()
-                            .overflow_hidden()
-                            // Panel header
-                            .child(
-                                div()
-                                    .px(px(12.0))
-                                    .py(px(8.0))
-                                    .border_b_1()
-                                    .border_color(Theme::with_alpha(theme.border_strong, 0.4))
-                                    .flex()
-                                    .items_center()
-                                    .justify_between()
-                                    .child(section_label("FONT LIBRARY", &theme))
-                                    .child(
-                                        div()
-                                            .flex()
-                                            .items_center()
-                                            .gap(px(8.0))
-                                            .child(badge(
-                                                format!("→ {target_label}"),
-                                                BadgeTone::Accent,
-                                                &theme,
-                                            ))
-                                            .child(
-                                                div()
-                                                    .text_size(px(11.0))
-                                                    .text_color(theme.text_muted)
-                                                    .child(format!("{matched_total} installed")),
-                                            ),
-                                    ),
-                            )
-                            // Filter + free-form apply
-                            .child(
-                                div()
-                                    .px(px(12.0))
-                                    .py(px(8.0))
-                                    .flex()
-                                    .items_center()
-                                    .gap(px(8.0))
-                                    .child(div().flex_1().child(self.font_filter.clone()))
-                                    .when(!self.font_query.trim().is_empty(), |d| {
-                                        d.child(
-                                            button(
-                                                "set-font-apply-typed",
-                                                format!("Use \u{201c}{}\u{201d}", self.font_query.trim()),
-                                                ButtonVariant::Secondary,
-                                                &theme,
-                                            )
-                                            .on_click(cx.listener(|this, _, _, cx| {
-                                                let q = this.font_query.clone();
-                                                this.apply_typed_font(&q, cx);
-                                            })),
-                                        )
-                                    }),
-                            )
-                            // Rows — each name rendered in its own face as a live preview.
-                            .child(
-                                div()
-                                    .px(px(8.0))
-                                    .pb(px(8.0))
-                                    .flex()
-                                    .flex_col()
-                                    .gap(px(2.0))
-                                    .children(font_rows.iter().enumerate().map(|(i, name)| {
-                                        let is_current =
-                                            name.eq_ignore_ascii_case(&current_family);
-                                        let fam = name.clone();
-                                        div()
-                                            .id(("set-font-row", i))
-                                            .w_full()
-                                            .px(px(10.0))
-                                            .py(px(6.0))
-                                            .rounded(px(4.0))
-                                            .border_1()
-                                            .border_color(if is_current {
-                                                theme.accent
-                                            } else {
-                                                gpui::transparent_black()
-                                            })
-                                            .bg(if is_current {
-                                                Theme::with_alpha(theme.accent, 0.14)
-                                            } else {
-                                                gpui::transparent_black()
-                                            })
-                                            .hover(|s| {
-                                                s.bg(Theme::with_alpha(theme.surface_hover, 0.7))
-                                            })
-                                            .cursor_pointer()
-                                            .flex()
-                                            .items_center()
-                                            .justify_between()
-                                            .gap(px(10.0))
-                                            .on_click(cx.listener(move |this, _, _, cx| {
-                                                this.apply_font(fam.clone(), cx);
-                                            }))
-                                            .child(
-                                                div()
-                                                    .font_family(name.clone())
-                                                    .text_size(px(13.0))
-                                                    .text_color(theme.text)
-                                                    .child(name.clone()),
-                                            )
-                                            .child(
-                                                div()
-                                                    .font_family(name.clone())
-                                                    .text_size(px(12.0))
-                                                    .text_color(theme.text_muted)
-                                                    .child("Ag0123 · The quick brown fox"),
-                                            )
-                                    })),
-                            )
-                            .when(truncated, |d| {
-                                d.child(
-                                    div()
-                                        .px(px(12.0))
-                                        .pb(px(8.0))
-                                        .text_size(px(11.0))
-                                        .text_color(theme.text_muted)
-                                        .child(format!(
-                                            "Showing {} of {} matches — type more to narrow.",
-                                            font_rows.len(),
-                                            matched_total
-                                        )),
-                                )
-                            }),
                     )
                     .into_any_element()
             }
